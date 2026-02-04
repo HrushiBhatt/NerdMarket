@@ -38,9 +38,15 @@ import org.w3c.dom.Text;
 
  */
 
+
 public class MainActivity extends AppCompatActivity {
 
-    private TextView messageText;   // define message textview variable
+    private TextView messageText;     // define message textview variable
+    private Button counterButton;
+    private Button historyButton;
+    // define counter button variable
+    public static String history = "";
+    public static int attemptCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +55,40 @@ public class MainActivity extends AppCompatActivity {
 
         /* initialize UI elements */
         messageText = findViewById(R.id.main_msg_txt);      // link to message textview in the Main activity XML
-        messageText.setText("Howdy there cowboy! Yeehaw");
+        counterButton = findViewById(R.id.main_counter_btn);// link to counter button in the Main activity XML
+        historyButton = findViewById(R.id.main_history_btn);
+
+        /* extract data passed into this activity from another activity */
+        Bundle extras = getIntent().getExtras();
+        if(extras == null) {
+            messageText.setText("Intent Example");
+        } else {
+            String number = extras.getString("NUM");  // this will come from LoginActivity
+            messageText.setText("The number was " + number);
+            attemptCount++;
+            history += "Attempt " + attemptCount + ": Went from 0 to " + number + "\n";
+        }
+
+        /* click listener on counter button pressed */
+        counterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /* when counter button is pressed, use intent to switch to Counter Activity */
+                Intent intent = new Intent(MainActivity.this, CounterActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        /* click listener on counter button pressed */
+        historyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /* when counter button is pressed, use intent to switch to Counter Activity */
+                Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

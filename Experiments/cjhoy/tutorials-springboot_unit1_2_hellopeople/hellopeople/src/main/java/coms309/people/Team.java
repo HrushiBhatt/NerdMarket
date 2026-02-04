@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter // Lombok Shortcut for generating getter methods (Matches variable names set ie teamName -> getteamName)
 @Setter // Similarly for setters as well
 @NoArgsConstructor // Default constructor
-public class Person {
+public class Team {
 
     private String teamName;
 
@@ -27,7 +27,7 @@ public class Person {
 //
 //    }
 
-    public Person(String teamName, String Game, String Location, String Record){
+    public Team(String teamName, String Game, String Location, String Record){
         this.teamName = teamName;
         this.Game = Game;
         this.Location = Location;

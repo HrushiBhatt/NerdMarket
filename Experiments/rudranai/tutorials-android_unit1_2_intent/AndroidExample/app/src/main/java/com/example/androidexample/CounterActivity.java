@@ -25,7 +25,7 @@ public class CounterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_counter);
 
-        /* initialize UI elements */
+        /* initialize UI elements by using findviewbyid to search the xml file for the buttons.*/
         numberTxt = findViewById(R.id.number);
         increaseBtn = findViewById(R.id.counter_increase_btn);
         decreaseBtn = findViewById(R.id.counter_decrease_btn);

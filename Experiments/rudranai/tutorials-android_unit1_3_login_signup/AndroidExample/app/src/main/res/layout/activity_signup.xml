@@ -101,6 +101,23 @@
         </EditText>
 
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily = "monospace"
+        android:text="Password should contain at least 3 numbers and a specail character.">
+    </TextView>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -114,10 +131,11 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
+            android:fontFamily="monospace"
             android:text="To Login"
             android:textSize="20sp"
             android:textColor="#ffffff"
-            android:backgroundTint="#FB8C00">
+            android:backgroundTint="@color/button_colors">
 
         </Button>
 
@@ -126,10 +144,11 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
+            android:fontFamily="monospace"
             android:text="Signup"
             android:textSize="20sp"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#FB8C00">
+            android:backgroundTint="@color/button_colors">
         </Button>
 
     </LinearLayout>

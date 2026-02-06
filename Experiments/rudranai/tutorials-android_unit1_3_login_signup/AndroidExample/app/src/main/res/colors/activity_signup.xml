@@ -11,20 +11,19 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:text="SIGNUP"
+        android:fontFamily="monospace"
         android:layout_gravity="center"
         android:layout_marginTop="100dp"
-        android:layout_marginBottom="150dp"
+        android:layout_marginBottom="80dp"
         android:textSize="30dp"
-        android:fontFamily="monospace"
-        android:textColor="#FB8C00">
+        android:textColor="#D1D1D1D1">
     </TextView>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:fontFamily="monospace"
         android:layout_marginBottom="30dp"
         android:orientation="horizontal">
 
@@ -32,17 +31,46 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="username: "
-            android:textSize="20dp"
             android:fontFamily="monospace"
-            android:textColor="#d1d1d1">
+            android:textSize="20dp"
+            android:textColor="#D1D1D1D1">
         </TextView>
 
         <EditText
-            android:id="@+id/login_username_edt"
+            android:id="@+id/signup_username_edt"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
             android:fontFamily="monospace"
+            android:layout_height="50dp"
+            android:textColor="#D1D1D1D1"
             android:hint="Enter Username Here">
+        </EditText>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="password: "
+            android:textSize="20dp"
+            android:textColor="#D1D1D1D1">
+        </TextView>
+
+        <EditText
+            android:id="@+id/signup_password_edt"
+            android:layout_width="wrap_content"
+            android:fontFamily="monospace"
+            android:inputType="textPassword"
+            android:layout_height="50dp"
+            android:textColor="#D1D1D1D1"
+            android:hint="Enter Password Here">
         </EditText>
 
     </LinearLayout>
@@ -55,19 +83,20 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="password: "
-            android:textSize="20dp"
+            android:layout_height="70sp"
+            android:text="confirm\npassword: "
             android:fontFamily="monospace"
-            android:textColor="#d1d1d1">
+            android:textSize="20dp"
+            android:textColor="#D1D1D1D1">
         </TextView>
 
         <EditText
-            android:id="@+id/login_password_edt"
+            android:id="@+id/signup_confirm_edt"
             android:layout_width="wrap_content"
             android:inputType="textPassword"
-            android:layout_height="50dp"
             android:fontFamily="monospace"
+            android:layout_height="70dp"
+            android:textColor="#D1D1D1D1"
             android:hint="Enter Password Here">
         </EditText>
 
@@ -81,27 +110,28 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/login_login_btn"
+            android:id="@+id/signup_login_btn"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:fontFamily="monospace"
-            android:text="Login"
+            android:text="To Login"
             android:textSize="20sp"
             android:textColor="#ffffff"
-            android:backgroundTint="@color/button_colors">
+            android:backgroundTint="#FB8C00">
+
         </Button>
 
         <Button
-            android:id="@+id/login_signup_btn"
+            android:id="@+id/signup_signup_btn"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="Signup"
             android:fontFamily="monospace"
+            android:text="Signup"
             android:textSize="20sp"
-            android:textColor="#ffffff"
-            android:backgroundTint="@color/button_colors">
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#FB8C00">
         </Button>
 
     </LinearLayout>

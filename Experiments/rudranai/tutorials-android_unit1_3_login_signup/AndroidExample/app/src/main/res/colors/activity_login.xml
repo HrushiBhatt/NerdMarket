@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:text="Login Example"
         android:layout_gravity="center"
         android:layout_marginTop="100dp"
         android:layout_marginBottom="150dp"
@@ -89,7 +89,7 @@
             android:text="Login"
             android:textSize="20sp"
             android:textColor="#ffffff"
-            android:backgroundTint="@color/button_colors">
+            android:backgroundTint="#FB8C00">
         </Button>
 
         <Button
@@ -101,7 +101,7 @@
             android:fontFamily="monospace"
             android:textSize="20sp"
             android:textColor="#ffffff"
-            android:backgroundTint="@color/button_colors">
+            android:backgroundTint="#FB8C00">
         </Button>
 
     </LinearLayout>

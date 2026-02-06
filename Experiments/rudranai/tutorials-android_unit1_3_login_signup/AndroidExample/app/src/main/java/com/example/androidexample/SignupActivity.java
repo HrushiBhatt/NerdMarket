@@ -56,6 +56,7 @@ public class SignupActivity extends AppCompatActivity {
         passwordEditText.addTextChangedListener(loginChecker);
         confirmEditText.addTextChangedListener(loginChecker);
 
+
         /* click listener on login button pressed */
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,12 +77,37 @@ public class SignupActivity extends AppCompatActivity {
                 String password = passwordEditText.getText().toString();
                 String confirm = confirmEditText.getText().toString();
 
-                if (password.equals(confirm)){
-                    Toast.makeText(getApplicationContext(), "Signing up", Toast.LENGTH_LONG).show();
+                if (password.equals(confirm) && checkIfvalid(password)){
+                    Toast.makeText(getApplicationContext(), "Signed up", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                    startActivity(intent);  // go to LoginActivity
                 }
-                else {
+                else if(!password.equals(confirm)) {
                     Toast.makeText(getApplicationContext(), "Password don't match", Toast.LENGTH_LONG).show();
                 }
+                else {
+                    Toast.makeText(getApplicationContext(), "Password does not fit criteria", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            public boolean checkIfvalid(String password){
+                String specialchars = "@_!#$%^&*()<>?/|}{~:';";
+                int specialCharacters = 0;
+                int numbers = 0;
+                for (int i = 0; i < password.length(); i++){
+                    if (specialchars.contains(Character.toString(password.charAt(i)))){
+                        specialCharacters++;
+                    }
+                    if (Character.isDigit(password.charAt(i))){
+                        numbers++;
+                    }
+                }
+
+                if((numbers > 2) && (specialCharacters >= 1)){
+                    return true;
+                }
+
+                return false;
             }
         });
     }

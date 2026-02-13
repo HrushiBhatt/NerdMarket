@@ -27,7 +27,7 @@ public class MarketController {
     // GET specific card by ID
     @GetMapping(path = "/api/cards/{id}")
     Market getCardById(@PathVariable Long id) {
-        return marketRepository.findById(id).orElse(null);
+        return marketRepository.findCardById(id);
     }
 
     // GET cards by type of trading card > Pokemon, MTG, Yu-Gi-Oh, Baseball, etc..
@@ -49,13 +49,13 @@ public class MarketController {
     // PUT update card by ID
     @PutMapping(path = "/api/cards/{id}")
     Market updateCard(@PathVariable Long id, @RequestBody Market request) {
-        Market card = marketRepository.findById(id).orElse(null);
+        Market card = marketRepository.findCardById(id);
         if (card == null) {
             return null;
         }
         request.setId(id);
         marketRepository.save(request);
-        return marketRepository.findById(id).orElse(null);
+        return marketRepository.findCardById(id);
     }
 
     // DELETE card by ID

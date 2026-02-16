@@ -4,6 +4,7 @@ package NerdMarket.market;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +16,11 @@ public class MarketController {
     @Autowired
     private MarketRepository marketRepository;
 
-    private String success = "{\"message\":\"success\"}";
-    private String error = "{\"message\":\"error\"}";
+    @Autowired
+    private MarketService marketService;
+
+    private final String success = "{\"message\":\"success\"}";
+    private final String error = "{\"message\":\"error\"}";
 
     // GET all cards
     @GetMapping(path = "/api/cards")
@@ -68,4 +72,39 @@ public class MarketController {
         return success;
     }
 
+    //DELETE All cards
+    @DeleteMapping(path = "/api/cards")
+    String deleteAllCards() {
+        marketRepository.deleteAll();
+        return success;
+    }
+
+    //DELETE by Card Type
+    @DeleteMapping(path = "/api/cards/type/{cardType}")
+    String deleteCardsByCardType(@PathVariable String cardType) {
+        List<Market> cards = marketRepository.findByCardType(cardType);
+        if (cards.isEmpty()) {
+            return "{\"message\":\"No cards found with type: " + cardType + "\"}";
+        }
+        marketRepository.deleteAll(cards);
+        return success;
+    }
+
+    //FETCH ALL pokemon cards from API tcgdex
+    @GetMapping(path = "/api/cards/pokemon/fetch-all")
+    String fetchAllPokemonCards() {
+        return marketService.fetchAllPokemonCards();
+    }
+
+    //FETCH ALL MTG cards from API scryfall
+    @GetMapping(path = "/api/cards/mtg/fetch-all")
+    String fetchAllMtgCards() {
+        return marketService.fetchAllMTGCards();
+    }
+
+    //FETCH all Yugioh cards
+    @GetMapping(path = "/api/cards/yugioh/fetch-all")
+    String fetchAllYugiohCards() {
+        return marketService.fetchAllYugiohCards();
+    }
 }

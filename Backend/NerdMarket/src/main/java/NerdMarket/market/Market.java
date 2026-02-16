@@ -27,4 +27,5 @@ public class Market {
     private String cardSet;         //Special set: Pokemon > Surging Sparks, Prismatic Evolution, etc..
     private String cardRarity;      //EX: Pokemon > Holo, Illustration Rare, etc..
     private double price;           //Current Value (could add recent change in value, etc..)
+    private String imageUrl;
 }

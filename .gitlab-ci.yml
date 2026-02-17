@@ -10,18 +10,18 @@ variables:
 cache:
   paths:
     - .m2/repository/
-    - Backend/NerdMarket/target/
+    - Backend/target/
 
 build:
   stage: build
   script:
-    - cd Backend/NerdMarket
+    - cd Backend/
     - mvn clean package -DskipTests
   artifacts:
     paths:
-      - Backend/NerdMarket/target/*.jar
-      - Backend/NerdMarket/src/**
-      - Backend/NerdMarket/pom.xml
+      - Backend/target/*.jar
+      - Backend/src/**
+      - Backend/pom.xml
     expire_in: 1 hour
   only:
     - main
@@ -61,7 +61,7 @@ deploy:
 
     # Restart application
     - |
-      cd ~/app/NerdMarket/target
+      cd ~/app/target
       
       # Stop old process
       pkill -f demo-0.0.1-SNAPSHOT.jar 2>/dev/null || true

@@ -69,7 +69,7 @@ public class ImageReqActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         // Called when an error occurs during the image request
                         // Log the error for debugging purposes
-                        Log.e("Volley Error", error.toString());
+                        Log.e("Volley Error", Log.getStackTraceString(error));
                         // Display a Toast message to the user about the error
                         Toast.makeText(ImageReqActivity.this, "Failed to load image", Toast.LENGTH_SHORT).show();
                     }

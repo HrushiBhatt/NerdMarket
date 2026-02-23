@@ -8,8 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 /*
 
 1. To run this project, open the directory "Android Example", otherwise it may not recognize the file structure properly
@@ -48,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private Button loginBackButton;
     private Button signupBackButton;
 
+    private Button cardDetailsButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         loginBackButton = findViewById(R.id.back_to_login_btn);
         signupBackButton.setVisibility(View.INVISIBLE);
         loginBackButton.setVisibility(View.INVISIBLE);
+        cardDetailsButton.findViewById(R.id.to_carddetails_btn);
 
         /* extract data passed into this activity from another activity */
         Bundle extras = getIntent().getExtras();
@@ -116,6 +117,14 @@ public class MainActivity extends AppCompatActivity {
                 /* when login button is pressed, use intent to switch to Login Activity */
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        cardDetailsButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+
+                Intent intent = new Intent(MainActivity.this, CardDetailActivity.class);
             }
         });
     }

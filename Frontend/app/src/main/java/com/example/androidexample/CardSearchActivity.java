@@ -2,8 +2,6 @@ package com.example.androidexample;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,15 +20,15 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CardDetailActivity extends AppCompatActivity{
+public class CardSearchActivity extends AppCompatActivity{
     private EditText searchEditText;  // define username edittext variable
+    private TextView displayText; // define the displaytext to test the object request.
 
     // UI Components
-    private Button btnJsonObjReq;
-    private TextView msgResponse;
+    private Button btnJsonObjReq; // define the search button
 
     // API URL to fetch JSON object data
-    private static final String URL_JSON_OBJECT = "https://jsonplaceholder.typicode.com/users/1";
+    private static final String URL_JSON_OBJECT = "http://coms-3090-022.class.las.iastate.edu:8080/api/cards/1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +37,9 @@ public class CardDetailActivity extends AppCompatActivity{
 
         // Initializing UI components
         btnJsonObjReq = findViewById(R.id.card_search_btn);
+        searchEditText = findViewById(R.id.card_search_field);
+        displayText = findViewById(R.id.card_Details);
+
 
 
         // Set a click listener to trigger JSON object request
@@ -65,7 +66,7 @@ public class CardDetailActivity extends AppCompatActivity{
                         Log.d("Volley Response", response.toString());
 
                         // Display response in TextView
-                        msgResponse.setText(response.toString());
+                        displayText.setText(response.toString());
                     }
                 },
                 new Response.ErrorListener() {
@@ -75,7 +76,7 @@ public class CardDetailActivity extends AppCompatActivity{
                         Log.e("Volley Error", error.toString());
 
                         // Display an error message in UI
-                        msgResponse.setText("Failed to load data. Please try again.");
+                        displayText.setText(error.toString());
                     }
                 }
         ) {

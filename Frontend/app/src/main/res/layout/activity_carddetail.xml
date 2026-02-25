@@ -45,6 +45,18 @@ android:orientation="vertical">
     android:layout_marginTop="100dp"
     android:orientation="horizontal">
 
+    <TextView
+        android:id="@+id/card_Details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Card Details"
+        android:layout_gravity="center"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="150dp"
+        android:textSize="30sp"
+        android:textColor="#fc0303">
+    </TextView>
+
     <Button
         android:id="@+id/card_search_btn"
         android:layout_width="150dp"

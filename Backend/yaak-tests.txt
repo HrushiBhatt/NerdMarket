@@ -202,6 +202,88 @@ GET /users should now only show 1 user.
 
 
 =============================================
+  ADMIN PORTAL ENDPOINTS
+=============================================
+
+
+=============================================
+16. ADMIN — Get All Users
+=============================================
+Method:  GET
+URL:     http://localhost:8080/admin/users?adminId=1
+Headers: Content-Type: application/json
+
+Expected: 200 OK — returns all users
+Test bad case: use adminId of non-admin user — should get "Unauthorized - admin access required"
+
+
+=============================================
+17. ADMIN — Delete User Account
+=============================================
+Method:  DELETE
+URL:     http://localhost:8080/admin/users/2
+Headers: Content-Type: application/json
+Body:
+{
+  "adminId": 1
+}
+
+Expected: 200 OK — "User deleted successfully"
+Test bad cases:
+  - Non-admin trying to delete: should fail with "Unauthorized"
+  - Admin trying to delete themselves: should fail with "Can't delete your own account"
+
+
+=============================================
+18. ADMIN — Promote User to Admin
+=============================================
+Method:  PUT
+URL:     http://localhost:8080/admin/users/2/promote
+Headers: Content-Type: application/json
+Body:
+{
+  "adminId": 1
+}
+
+Expected: 200 OK — returns user with isAdmin = true
+Test bad case: non-admin trying to promote — should get "Unauthorized"
+
+
+=============================================
+19. ADMIN — Demote User from Admin
+=============================================
+Method:  PUT
+URL:     http://localhost:8080/admin/users/2/demote
+Headers: Content-Type: application/json
+Body:
+{
+  "adminId": 1
+}
+
+Expected: 200 OK — returns user with isAdmin = false
+Test bad cases:
+  - Non-admin trying to demote: should fail
+  - Admin trying to demote themselves: should fail with "Can't remove your own admin status"
+
+
+=============================================
+20. ADMIN — Toggle User Active Status
+=============================================
+Method:  PUT
+URL:     http://localhost:8080/admin/users/2/toggle-active
+Headers: Content-Type: application/json
+Body:
+{
+  "adminId": 1,
+  "active": false
+}
+
+Expected: 200 OK — returns user with active status changed
+Change "active" to true to reactivate
+Test bad case: non-admin trying to toggle — should get "Unauthorized"
+
+
+=============================================
   SUGGESTED TEST ORDER
 =============================================
 1. Signup user 1 (johndoe)
@@ -220,3 +302,14 @@ GET /users should now only show 1 user.
 14. Grant admin — verify isAdmin = true
 15. Remove admin — verify isAdmin = false
 16. Delete user 2 — verify gone from get all
+
+ADMIN PORTAL TESTS:
+17. Grant user 1 admin privileges (use endpoint #13)
+18. Admin get all users — verify works
+19. Signup user 3 for testing
+20. Admin promote user 3 to admin — verify works
+21. Admin demote user 3 from admin — verify works
+22. Admin toggle user 3 to inactive — verify login fails
+23. Admin toggle user 3 to active — verify login works
+24. Admin delete user 3 — verify gone
+25. Try admin endpoints with non-admin user 2 — verify all fail

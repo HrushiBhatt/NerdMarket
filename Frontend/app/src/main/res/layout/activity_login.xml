@@ -37,7 +37,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Username: "
+            android:text="User/Email: "
             android:textSize="20dp"
             android:textColor="#ffffff">
         </TextView>
@@ -45,6 +45,7 @@
         <EditText
             android:id="@+id/login_username"
             android:layout_width="wrap_content"
+            android:textColor="#ffffff"
             android:layout_height="50dp"
             android:hint="Enter Username Here">
         </EditText>
@@ -69,6 +70,7 @@
             android:id="@+id/login_password"
             android:layout_width="wrap_content"
             android:inputType="textPassword"
+            android:textColor="#ffffff"
             android:layout_height="50dp"
             android:hint="Enter Password Here">
         </EditText>

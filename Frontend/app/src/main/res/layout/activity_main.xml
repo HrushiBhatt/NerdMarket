@@ -63,6 +63,16 @@
     </Button>
 
     <Button
+        Frontend/app/src/main/res/layout/activity_main.xml
+        android:id="@+id/to_carddetails_btn"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="To Card Details"
+        android:textColor="#ffffff"
+        android:textSize="20sp" />
+
+<Button
         android:id="@+id/delete_account_btn"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
@@ -72,6 +82,7 @@
         android:textSize="20sp"
         android:textColor="#ffffff">
     </Button>
+
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

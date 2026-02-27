@@ -27,8 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.w3c.dom.Text;
-
 /*
 
 1. To run this project, open the directory "Android Example", otherwise it may not recognize the file structure properly
@@ -63,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView messageText;   // define message textview variable
     private TextView usernameText;  // define username textview variable
     private Button loginBackButton;
+    private Button cardDetailsButton;
     private Button signupBackButton;
     private Button deleteAccountButton;
     private int id;
@@ -76,10 +75,12 @@ public class MainActivity extends AppCompatActivity {
         messageText = findViewById(R.id.main_msg_txt);      // link to message textview in the Main activity XML
         usernameText = findViewById(R.id.main_username_txt);// link to username textview in the Main activity XML
         signupBackButton = findViewById(R.id.back_to_signup_btn);
+        cardDetailsButton = findViewById(R.id.to_carddetails_btn);
         loginBackButton = findViewById(R.id.back_to_login_btn);
         signupBackButton.setVisibility(View.INVISIBLE);
         loginBackButton.setVisibility(View.INVISIBLE);
         deleteAccountButton = findViewById(R.id.delete_account_btn);
+
 
         /* extract data passed into this activity from another activity */
         Bundle extras = getIntent().getExtras();

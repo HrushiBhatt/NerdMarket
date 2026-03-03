@@ -22,6 +22,9 @@ public class PriceTracking {
     @JoinColumn(name = "card_id")
     private Market card;
 
+    @Column(name = "card_id", insertable = false, updatable = false)
+    private Long cardId;
+
     private double price;
     private LocalDateTime recordedAt;
 

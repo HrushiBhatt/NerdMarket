@@ -11,5 +11,6 @@ public interface MarketRepository extends JpaRepository<Market, Long> {
     Market findCardById(Long id);
 
     List<Market> findTop10ByOrderByPriceDesc();
+    List<Market> findTop100ByOrderByPriceDesc();
     List<Market> findTop10ByCardTypeOrderByPriceDesc(String cardType);
 }

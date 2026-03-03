@@ -10,6 +10,9 @@ public class PriceTrackingController {
     @Autowired
     private PriceTrackingRepository priceTrackingRepository;
 
+    @Autowired
+    private PriceTrackingService priceTrackingService;
+
     private final String success = "{\"message\":\"success\"}";
     private final String error = "{\"message\":\"error\"}";
 
@@ -29,6 +32,12 @@ public class PriceTrackingController {
     @GetMapping(path = "/api/prices/card/{cardId}/latest")
     PriceTracking getLatestPriceByCard(@PathVariable Long cardId) {
         return priceTrackingRepository.findFirstByCardIdOrderByRecordedAtDesc(cardId);
+    }
+
+    //POPULATE price tracking table with top 100 most valued cards.
+    @GetMapping(path = "/api/prices/populate")
+    String populatePriceData() {
+        return priceTrackingService.populatePriceData();
     }
 
     // POST to create a new price record

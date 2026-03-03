@@ -3,6 +3,7 @@ package NerdMarket.prices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class PriceTrackingController {
@@ -38,6 +39,12 @@ public class PriceTrackingController {
     @GetMapping(path = "/api/prices/populate")
     String populatePriceData() {
         return priceTrackingService.populatePriceData();
+    }
+
+    //GET top 10 biggest Movers
+    @GetMapping(path = "/api/prices/biggest-movers")
+    List<Map<String, Object>> getBiggestMovers() {
+        return priceTrackingService.getBiggestMovers();
     }
 
     // POST to create a new price record

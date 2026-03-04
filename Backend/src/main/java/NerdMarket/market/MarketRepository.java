@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface MarketRepository extends JpaRepository<Market, Long> {
     List<Market> findByCardType(String cardType);
     Market findCardById(Long id);
+    List<Market> findByCardNameContainingIgnoreCase(String cardName);
 
     List<Market> findTop10ByOrderByPriceDesc();
     List<Market> findTop100ByOrderByPriceDesc();

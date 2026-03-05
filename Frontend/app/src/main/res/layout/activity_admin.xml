@@ -17,10 +17,10 @@
         />
 
     <TextView
-        android:id="@+id/main_username_txt"
+        android:id="@+id/admin_main_username_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="{{username}}"
+        android:text="Admin Panel"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="100dp"
@@ -30,7 +30,7 @@
 
 
     <TextView
-        android:id="@+id/main_msg_txt"
+        android:id="@+id/admin_main_msg_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="{{username}}"
@@ -42,7 +42,7 @@
     </TextView>
 
     <Button
-        android:id="@+id/back_to_login_btn"
+        android:id="@+id/admin_back_to_login_btn"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -53,7 +53,7 @@
     </Button>
 
     <Button
-        android:id="@+id/back_to_signup_btn"
+        android:id="@+id/admin_back_to_signup_btn"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -63,7 +63,7 @@
     </Button>
 
     <Button
-        android:id="@+id/to_carddetails_btn"
+        android:id="@+id/admin_to_carddetails_btn"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -72,26 +72,17 @@
         android:textSize="20sp" />
 
     <Button
-        android:id="@+id/to_admin_btn"
+        android:id="@+id/admin_to_main_btn"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Admin View"
+        android:text="Back to main"
         android:textColor="#ffffff"
         android:textSize="20sp" />
 
 
     <Button
-        android:id="@+id/to_pricecrud_btn"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="To Price Crud"
-        android:textColor="#ffffff"
-        android:textSize="20sp" />
-
-    <Button
-        android:id="@+id/delete_account_btn"
+        android:id="@+id/admin_delete_account_btn"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private Button cardDetailsButton;
     private Button signupBackButton;
     private Button deleteAccountButton;
+    private Button toAdminButton;
     private int id;
     private static final String DELETE_URL = "http://coms-3090-022.class.las.iastate.edu:8080/users/";
     @Override
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         usernameText = findViewById(R.id.main_username_txt);// link to username textview in the Main activity XML
         signupBackButton = findViewById(R.id.back_to_signup_btn);
         cardDetailsButton = findViewById(R.id.to_carddetails_btn);
+        toAdminButton = findViewById(R.id.to_admin_btn);
         loginBackButton = findViewById(R.id.back_to_login_btn);
         signupBackButton.setVisibility(View.INVISIBLE);
         loginBackButton.setVisibility(View.INVISIBLE);

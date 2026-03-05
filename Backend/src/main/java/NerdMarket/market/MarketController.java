@@ -52,6 +52,12 @@ public class MarketController {
         return marketRepository.findTop10ByCardTypeOrderByPriceDesc(cardType);
     }
 
+    //GET search by card name
+    @GetMapping(path = "/api/cards/search/{cardName}")
+    List<Market> getCardsByCardName(@PathVariable String cardName) {
+        return marketRepository.findByCardNameContainingIgnoreCase(cardName);
+    }
+
     // POST creating new card
     @PostMapping(path = "/api/cards")
     String createCard(@RequestBody Market card) {

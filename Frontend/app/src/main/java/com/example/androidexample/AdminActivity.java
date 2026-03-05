@@ -1,29 +1,25 @@
 package com.example.androidexample;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,7 +52,7 @@ import java.util.Map;
  */
 
 
-public class MainActivity extends AppCompatActivity {
+public class AdminActivity extends AppCompatActivity {
 
     private TextView messageText;   // define message textview variable
     private TextView usernameText;  // define username textview variable
@@ -64,24 +60,24 @@ public class MainActivity extends AppCompatActivity {
     private Button cardDetailsButton;
     private Button signupBackButton;
     private Button deleteAccountButton;
-    private Button toAdminButton;
+    private Button toMainButton;
     private int id;
     private static final String DELETE_URL = "http://coms-3090-022.class.las.iastate.edu:8080/users/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);             // link to Main activity XML
+        setContentView(R.layout.activity_admin);             // link to Main activity XML
 
         /* initialize UI elements */
-        messageText = findViewById(R.id.main_msg_txt);      // link to message textview in the Main activity XML
-        usernameText = findViewById(R.id.main_username_txt);// link to username textview in the Main activity XML
-        signupBackButton = findViewById(R.id.back_to_signup_btn);
-        cardDetailsButton = findViewById(R.id.to_carddetails_btn);
-        toAdminButton = findViewById(R.id.to_admin_btn);
-        loginBackButton = findViewById(R.id.back_to_login_btn);
+        messageText = findViewById(R.id.admin_main_msg_txt);      // link to message textview in the Main activity XML
+        usernameText = findViewById(R.id.admin_main_username_txt);// link to username textview in the Main activity XML
+        signupBackButton = findViewById(R.id.admin_back_to_signup_btn);
+        cardDetailsButton = findViewById(R.id.admin_to_carddetails_btn);
+        toMainButton = findViewById(R.id.admin_to_main_btn);
+        loginBackButton = findViewById(R.id.admin_back_to_login_btn);
         signupBackButton.setVisibility(View.INVISIBLE);
         loginBackButton.setVisibility(View.INVISIBLE);
-        deleteAccountButton = findViewById(R.id.delete_account_btn);
+        deleteAccountButton = findViewById(R.id.admin_delete_account_btn);
 
 
         /* extract data passed into this activity from another activity */
@@ -101,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 /* when signup button is pressed, use intent to switch to Signup Activity */
-                Intent intent = new Intent(MainActivity.this, SignupActivity.class);
+                Intent intent = new Intent(AdminActivity.this, SignupActivity.class);
                 startActivity(intent);
             }
         });
@@ -111,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 /* when login button is pressed, use intent to switch to Login Activity */
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                Intent intent = new Intent(AdminActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
         });
@@ -126,16 +122,16 @@ public class MainActivity extends AppCompatActivity {
         cardDetailsButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent intent = new Intent(MainActivity.this, CardSearchActivity.class);
+                Intent intent = new Intent(AdminActivity.this, CardSearchActivity.class);
                 startActivity(intent);
             }
         });
 
-        toAdminButton.setOnClickListener(new View.OnClickListener(){
+        toMainButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-            Intent intent = new Intent(MainActivity.this, AdminActivity.class);
-            startActivity(intent);
+                Intent intent = new Intent(AdminActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
     }

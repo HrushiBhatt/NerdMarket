@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     private Button deleteAccountButton;
     private Button toAdminButton;
     private int id;
+
+    private boolean isAdmin;
     private static final String DELETE_URL = "http://coms-3090-022.class.las.iastate.edu:8080/users/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +94,19 @@ public class MainActivity extends AppCompatActivity {
             messageText.setText("Home Page");
         } else {
             id = extras.getInt("id", -1);
+            isAdmin = extras.getBoolean("isAdmin", false);
             messageText.setText("Welcome " + extras.getString("username"));
-            usernameText.setText(extras.getString("username")); // this will come from LoginActivity
+            usernameText.setText(extras.getString("username") + " " + isAdmin); // this will come from LoginActivity
             loginBackButton.setVisibility(View.VISIBLE);            // set new login button visible
             signupBackButton.setVisibility(View.VISIBLE);           // set new signup button visible
+
+            //check if the user is an admin and make the admin tab visible.
+            if (isAdmin) {
+                toAdminButton.setVisibility(View.VISIBLE);
+            } else {
+                toAdminButton.setVisibility(View.GONE);
+            }
+
         }
 
         signupBackButton.setOnClickListener(new View.OnClickListener() {
@@ -147,6 +158,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
             Intent intent = new Intent(MainActivity.this, AdminActivity.class);
+            intent.putExtra("id", id);
+            intent.putExtra("username", extras.getString("username"));
+            intent.putExtra("isAdmin", isAdmin);
             startActivity(intent);
             }
         });

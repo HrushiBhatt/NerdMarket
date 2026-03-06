@@ -37,6 +37,8 @@ public class LoginActivity extends AppCompatActivity {
         goButton = findViewById(R.id.login_go_btn);
         signupButton = findViewById(R.id.login_signup_btn);
 
+        //tracks if the user is an admin.
+
 
         /* click listener on login button pressed */
         goButton.setOnClickListener(new View.OnClickListener() {
@@ -73,10 +75,12 @@ public class LoginActivity extends AppCompatActivity {
                                 try {
                                     int ID = jsonObject.getInt("id");
                                     String USERNAME = jsonObject.getString("username");
+                                    boolean IS_ADMIN = jsonObject.getBoolean("admin");
                                     Toast.makeText(getApplicationContext(), "Login Successful!", Toast.LENGTH_LONG).show();
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     intent.putExtra("id", ID);  // key-value to pass to the MainActivity
                                     intent.putExtra("username", USERNAME);  // key-value to pass to the MainActivity
+                                    intent.putExtra("isAdmin", IS_ADMIN); // another key-value to pass to the MainActivity.
                                     startActivity(intent);
                                     finish();
                                 } catch (JSONException e) {

@@ -1,20 +1,19 @@
 package com.example.androidexample;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONException;
@@ -23,183 +22,317 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-
-1. To run this project, open the directory "Android Example", otherwise it may not recognize the file structure properly
-
-2. Ensure you are using a compatible version of gradle, to do so you need to check 2 files.
-
-    AndroidExample/Gradle Scripts/build.gradle
-    Here, you will have this block of code. Ensure it is set to a compatible version,
-    in this case 8.12.2 should be sufficient:
-        plugins {
-            id 'com.android.application' version '8.12.2' apply false
-        }
-
-    Gradle Scripts/gradle-wrapper.properties
-
-3. This file is what actually determines the Gradle version used, 8.13 should be sufficient.
-    "distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip" ---Edit the version if needed
-
-4. You might be instructed by the plugin manager to upgrade plugins, accept it and you may execute the default selected options.
-
-5. Press "Sync project with gradle files" located at the top right of Android Studio,
-   once this is complete you will be able to run the app
-
-   This version is compatible with both JDK 17 and 21. The Java version you want to use can be
-   altered in Android Studio->Settings->Build, Execution, Deployment->Build Tools->Gradle
-
- */
-
-
 public class AdminActivity extends AppCompatActivity {
 
-    private TextView messageText;   // define message textview variable
-    private TextView usernameText;  // define username textview variable
-    private Button loginBackButton;
-    private Button cardDetailsButton;
-    private Button signupBackButton;
+    private static final String API_URL = "http://coms-3090-022.class.las.iastate.edu:8080/admin";
+
+    // Activate/Deactivate
+    private Button activateDeacButton;
+    private LinearLayout activateDeacContainer;
+    private EditText cardSearchField;
+    private Button activateBtn;
+    private Button deactivateBtn;
+
+    // Promote/Demote
+    private Button promoteDemoteButton;
+    private LinearLayout promoteDemoteContainer;
+    private EditText promoteDemoteField;
+    private Button promoteBtn;
+    private Button demoteBtn;
+
+    // Delete
     private Button deleteAccountButton;
+    private LinearLayout deleteContainer;
+    private EditText deleteField;
+    private Button deleteBtn;
+
+    // Show All Accounts
+    private Button cardDetailsButton;
+    private CardView accountCard;
+    private LinearLayout accountCardDetail;
+    private TextView accountCardDetailName;
+
+    // Back to Main
     private Button toMainButton;
+
     private int id;
-    private static final String DELETE_URL = "http://coms-3090-022.class.las.iastate.edu:8080/users/";
+
+    private boolean admin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin);             // link to Main activity XML
-
-        /* initialize UI elements */
-        messageText = findViewById(R.id.admin_main_msg_txt);      // link to message textview in the Main activity XML
-        usernameText = findViewById(R.id.admin_main_username_txt);// link to username textview in the Main activity XML
-        signupBackButton = findViewById(R.id.admin_back_to_signup_btn);
-        cardDetailsButton = findViewById(R.id.admin_to_carddetails_btn);
-        toMainButton = findViewById(R.id.admin_to_main_btn);
-        loginBackButton = findViewById(R.id.admin_back_to_login_btn);
-        signupBackButton.setVisibility(View.INVISIBLE);
-        loginBackButton.setVisibility(View.INVISIBLE);
-        deleteAccountButton = findViewById(R.id.admin_delete_account_btn);
+        setContentView(R.layout.activity_admin);
 
 
-        /* extract data passed into this activity from another activity */
+        // Get all views
+
+        // Activate buttons
+        activateDeacButton   = findViewById(R.id.admin_activate_deactivate_btn);
+        activateDeacContainer= findViewById(R.id.admin_activate_deactivate_container);
+        cardSearchField      = findViewById(R.id.card_search_field);
+        activateBtn          = findViewById(R.id.admin_activate_btn);
+        deactivateBtn        = findViewById(R.id.admin_deactivate_btn);
+
+        //Promotion buttons
+        promoteDemoteButton  = findViewById(R.id.admin_promote_demote_btn);
+        promoteDemoteContainer = findViewById(R.id.admin_promote_demote_container);
+        promoteDemoteField   = findViewById(R.id.admin_promote_demote_field);
+        promoteBtn           = findViewById(R.id.admin_promote_btn);
+        demoteBtn            = findViewById(R.id.admin_demote_btn);
+
+        // Delete buttons
+        deleteAccountButton  = findViewById(R.id.admin_delete_other_account_btn);
+        deleteContainer      = findViewById(R.id.admin_delete_container);
+        deleteField          = findViewById(R.id.admin_delete_field);
+        deleteBtn            = findViewById(R.id.admin_delete_btn);
+
+        // ShowAllAccounts button.
+        cardDetailsButton    = findViewById(R.id.admin_to_carddetails_btn);
+        accountCard          = findViewById(R.id.account_card);
+        accountCardDetail    = findViewById(R.id.admin_account_cardDetail);
+        accountCardDetailName= findViewById(R.id.admin_account_cardDetail_name);
+
+        // Back to main
+        toMainButton         = findViewById(R.id.admin_to_main_btn);
+
+        activateDeacContainer.setVisibility(View.GONE);
+        promoteDemoteContainer.setVisibility(View.GONE);
+        deleteContainer.setVisibility(View.GONE);
+        accountCard.setVisibility(View.GONE);
+
+        // Read bundle given from main (which was passed from login).
         Bundle extras = getIntent().getExtras();
-        if(extras == null) {
-            messageText.setText("Home Page");
+        if (extras == null) {
+            id = -1;
+            admin = false;
         } else {
             id = extras.getInt("id", -1);
-            messageText.setText("Welcome " + extras.getString("username"));
-            usernameText.setText(extras.getString("username")); // this will come from LoginActivity
-            loginBackButton.setVisibility(View.VISIBLE);            // set new login button visible
-            signupBackButton.setVisibility(View.VISIBLE);           // set new signup button visible
+            admin = extras.getBoolean("isAdmin", false);
         }
 
-        signupBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                /* when signup button is pressed, use intent to switch to Signup Activity */
-                Intent intent = new Intent(AdminActivity.this, SignupActivity.class);
-                startActivity(intent);
+        activateDeacButton.setOnClickListener(v -> toggle(activateDeacContainer));
+
+        activateBtn.setOnClickListener(v -> {
+            String targetIdStr = cardSearchField.getText().toString().trim();
+            if (targetIdStr.isEmpty()) {
+                Toast.makeText(this, "Enter a target user ID", Toast.LENGTH_SHORT).show();
+                return;
             }
+            activateDeactivateRequest(Long.parseLong(targetIdStr), true);
         });
 
-        loginBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                /* when login button is pressed, use intent to switch to Login Activity */
-                Intent intent = new Intent(AdminActivity.this, LoginActivity.class);
-                startActivity(intent);
+        deactivateBtn.setOnClickListener(v -> {
+            String targetIdStr = cardSearchField.getText().toString().trim();
+            if (targetIdStr.isEmpty() || !targetIdStr.matches(".*\\d.*")) { //uses regex to check if there is a number for now because time crunch. Adding this to the backlog to eventually fix to not accept strings with a number in the input as we need ID's.
+                Toast.makeText(this, "Enter a target user ID", Toast.LENGTH_SHORT).show();
+                return;
             }
+            activateDeactivateRequest(Long.parseLong(targetIdStr), false);
         });
 
-        deleteAccountButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteAccountConfirm();
+
+        promoteDemoteButton.setOnClickListener(v -> toggle(promoteDemoteContainer));
+
+        promoteBtn.setOnClickListener(v -> {
+            String targetIdStr = promoteDemoteField.getText().toString().trim();
+            if (targetIdStr.isEmpty()) {
+                Toast.makeText(this, "Enter a target user ID", Toast.LENGTH_SHORT).show();
+                return;
             }
+            promoteDemoteRequest(Long.parseLong(targetIdStr), true);
         });
 
-        cardDetailsButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                Intent intent = new Intent(AdminActivity.this, CardSearchActivity.class);
-                startActivity(intent);
+        demoteBtn.setOnClickListener(v -> {
+            String targetIdStr = promoteDemoteField.getText().toString().trim();
+            if (targetIdStr.isEmpty()) {
+                Toast.makeText(this, "Enter a target user ID", Toast.LENGTH_SHORT).show();
+                return;
             }
+            promoteDemoteRequest(Long.parseLong(targetIdStr), false);
         });
 
-        toMainButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                Intent intent = new Intent(AdminActivity.this, MainActivity.class);
-                startActivity(intent);
+
+        deleteAccountButton.setOnClickListener(v -> toggle(deleteContainer));
+
+        deleteBtn.setOnClickListener(v -> {
+            String targetIdStr = deleteField.getText().toString().trim();
+            if (targetIdStr.isEmpty()) {
+                Toast.makeText(this, "Enter a target user ID", Toast.LENGTH_SHORT).show();
+                return;
             }
+            deleteOtherAccountRequest(Long.parseLong(targetIdStr));
+        });
+
+
+        cardDetailsButton.setOnClickListener(v -> getAllUsersRequest());
+
+
+        toMainButton.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminActivity.this, MainActivity.class);
+            startActivity(intent);
         });
     }
 
-    void deleteAccountRequest(String password){
-        String url = DELETE_URL + id + "/delete-account";
+    //Toggle helper to switch between views toggled on or off.
+    private void toggle(View view) {
+        if(view.getVisibility() == View.VISIBLE){
+            view.setVisibility(View.GONE);
+        } else {
+            view.setVisibility(View.VISIBLE);
+        }
 
-        JSONObject jsonObject = new JSONObject();
+    }
 
+
+    // GET /admin/users?userId={id}
+    private void getAllUsersRequest() {
+        if (id == -1) { Toast.makeText(this, "Bad user session", Toast.LENGTH_SHORT).show(); return; }
+
+        String url = API_URL + "/users?userId=" + id;
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET, url, null,
+                response -> {
+                    accountCard.setVisibility(View.VISIBLE);
+                    String retString = "";
+                    for (int i = 0; i < response.length(); i++) {
+                        try {
+                            JSONObject user = response.getJSONObject(i);
+                            retString +=    "ID: "+ user.getLong("id") +
+                                            "  //  " + user.getString("username") +
+                                            "  //  Active: " + user.getBoolean("active")+
+                                            "  //  Admin: "+ user.getBoolean("admin")+
+                                            "\n";
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    accountCardDetailName.setText(!retString.isEmpty() ? retString : "No users found.");
+                },
+                error -> {
+                    String msg = "Failed to fetch users.";
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        msg = new String(error.networkResponse.data);
+                    }
+                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                }
+        );
+
+        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(request);
+    }
+
+    // PUT /admin/users/{targetId}/activate  OR  /deactivate
+    private void activateDeactivateRequest(long targetId, boolean activate) {
+        if (id == -1) {
+            Toast.makeText(getApplicationContext(), "Bad user session", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String action;
+
+        if(activate){
+            action = "activate";
+        } else {
+            action ="deactivate";
+        }
+
+        String url = API_URL + "/users/" + targetId + "/" + action + "?userId=" + id;
+
+        StringRequest request = new StringRequest(
+                Request.Method.PUT, url,
+                response -> Toast.makeText(this,
+                        "User " + targetId + " " + (action + "d"),
+                        Toast.LENGTH_SHORT).show(),
+                error -> {
+                    String msg = action + " failed.";
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        msg = new String(error.networkResponse.data);
+                    }
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(request);
+    }
+
+
+    // PUT /admin/users/{targetId}/promote  or  /demote
+    private void promoteDemoteRequest(long targetId, boolean promote) {
         if (id == -1) {
             Toast.makeText(this, "Bad user session", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        try {
-            jsonObject.put("password", password);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        String action;
+        if(promote){
+            action = "promote";
+        } else {
+            action ="demote";
         }
+        String url = API_URL + "/users/" + targetId + "/" + action + "?userId=" + id;
 
-        StringRequest stringRequest = new StringRequest(
-                Request.Method.DELETE,
-                url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                        startActivity(intent);
-                        finish();
+        StringRequest request = new StringRequest(
+                Request.Method.PUT, url,
+                response -> Toast.makeText(this,
+                        "User " + targetId + (" " + action + "d"),
+                        Toast.LENGTH_SHORT).show(),
+                error -> {
+                    String msg = action + " failed.";
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        msg = new String(error.networkResponse.data);
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        String message = "Account delete Failed.";
-//                        if (error.networkResponse != null && error.networkResponse.data != null) {
-//                            message = new String(error.networkResponse.data); //FOR GETTING SPECIFIC ERROR INFO
-//                        }
-                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                    }
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                 }
         ) {
-
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
                 headers.put("Content-Type", "application/json");
-                headers.put("X-Password", password);
                 return headers;
             }
         };
 
-        VolleySingleton.getInstance(getApplicationContext())
-                .addToRequestQueue(stringRequest);
+        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(request);
     }
-    void deleteAccountConfirm(){
-        EditText passwordConfirm = new EditText(this);
 
-        new AlertDialog.Builder(this).setTitle("Are you sure")
-                .setMessage("Enter password to confirm").setView(passwordConfirm)
-                .setPositiveButton("Delete",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                String password = passwordConfirm.getText().toString();
-                                deleteAccountRequest(password);
-                            }
-                        }).setNegativeButton("Cancel", null).show();
+
+    // DELETE /admin/users/{targetId}?userId={id}
+    private void deleteOtherAccountRequest(long targetId) {
+        if (id == -1) {
+            Toast.makeText(this, "Bad user session", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String url = API_URL + "/users/" + targetId + "?userId=" + id;
+
+        StringRequest request = new StringRequest(
+                Request.Method.DELETE, url,
+                response -> Toast.makeText(this, "User " + targetId + " deleted.", Toast.LENGTH_SHORT).show(),
+                error -> {
+                    String msg = "Delete failed.";
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        msg = new String(error.networkResponse.data);
+                    }
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(request);
     }
 }

@@ -51,6 +51,10 @@ public class CardSearchActivity extends AppCompatActivity {
 
     private Button returnToMain;
 
+    private int id;
+    private String username;
+    private boolean isAdmin;
+
     private static final String BASE_URL = "http://coms-3090-022.class.las.iastate.edu:8080/api/cards";
 
     @Override
@@ -85,14 +89,26 @@ public class CardSearchActivity extends AppCompatActivity {
 
         returnToMain = findViewById(R.id.cardlookup_to_main_button);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            id = -1;
+            isAdmin = false;
+        } else {
+            id = extras.getInt("id", -1);
+            isAdmin = extras.getBoolean("isAdmin", false);
+            username = extras.getString("username"); // used when moving back to the main view.
+        }
+
         btnSearch.setOnClickListener(v -> handleSearch());
+
         cardEditBtn.setOnClickListener(v -> toggleEditMode(true));
-        returnToMain.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                Intent intent = new Intent(CardSearchActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
+
+        returnToMain.setOnClickListener(v -> {
+            Intent intent = new Intent(CardSearchActivity.this, MainActivity.class);
+            intent.putExtra("id", id);
+            intent.putExtra("isAdmin", isAdmin);
+            intent.putExtra("username", username);
+            startActivity(intent);
         });
     }
 
@@ -138,8 +154,13 @@ public class CardSearchActivity extends AppCompatActivity {
 
             clonedCard.setVisibility(View.VISIBLE);
 
-            // Edit button
             Button btnEdit = clonedCard.findViewById(R.id.card_edit_btn);
+
+            //blocks the button from ever being visible if not an admin
+            if(!isAdmin){
+                btnEdit.setVisibility(View.GONE);
+            }
+
             Button btnSave = clonedCard.findViewById(R.id.card_save_btn);
 
             btnEdit.setOnClickListener(v -> {

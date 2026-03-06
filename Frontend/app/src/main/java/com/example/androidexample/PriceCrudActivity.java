@@ -34,6 +34,10 @@ public class PriceCrudActivity extends AppCompatActivity {
     int currentID = -1;
     int priceIndex = -1;
 
+    private int id;
+    private String username;
+    private boolean isAdmin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +52,17 @@ public class PriceCrudActivity extends AppCompatActivity {
         updateButton = findViewById(R.id.pricecrud_update_btn);
         deleteButton = findViewById(R.id.pricecrud_deleteALL_btn);
         homeButton = findViewById(R.id.pricecrud_home_btn);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            id = -1;
+            isAdmin = false;
+            username = "Please log out and back in.";
+        } else {
+            id = extras.getInt("id", -1);
+            isAdmin = extras.getBoolean("isAdmin", false);
+            username = extras.getString("username"); // used when moving back to the main view.
+        }
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,6 +116,9 @@ public class PriceCrudActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(PriceCrudActivity.this, MainActivity.class);
+                intent.putExtra("id", id);
+                intent.putExtra("isAdmin", isAdmin);
+                intent.putExtra("username", username);
                 startActivity(intent);
                 finish();
             }

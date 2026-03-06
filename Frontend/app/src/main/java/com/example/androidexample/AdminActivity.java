@@ -33,6 +33,12 @@ public class AdminActivity extends AppCompatActivity {
     private Button activateBtn;
     private Button deactivateBtn;
 
+    // Unlock Account
+    private Button unlockAccountButton;
+    private LinearLayout unlockAccountContainer;
+    private EditText unlockSearchField;
+    private Button unlockBtn;
+
     // Promote/Demote
     private Button promoteDemoteButton;
     private LinearLayout promoteDemoteContainer;
@@ -59,6 +65,8 @@ public class AdminActivity extends AppCompatActivity {
 
     private boolean admin;
 
+    private String username;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +81,12 @@ public class AdminActivity extends AppCompatActivity {
         cardSearchField      = findViewById(R.id.card_search_field);
         activateBtn          = findViewById(R.id.admin_activate_btn);
         deactivateBtn        = findViewById(R.id.admin_deactivate_btn);
+
+        //Unlock buttons
+        unlockAccountButton = findViewById(R.id.admin_unlock_btn);
+        unlockAccountContainer = findViewById(R.id.admin_unlock_container);
+        unlockSearchField = findViewById(R.id.admin_unlock_ID_searchField);
+        unlockBtn = findViewById(R.id.admin_unlockAccount_btn);
 
         //Promotion buttons
         promoteDemoteButton  = findViewById(R.id.admin_promote_demote_btn);
@@ -99,6 +113,7 @@ public class AdminActivity extends AppCompatActivity {
         activateDeacContainer.setVisibility(View.GONE);
         promoteDemoteContainer.setVisibility(View.GONE);
         deleteContainer.setVisibility(View.GONE);
+        unlockAccountContainer.setVisibility(View.GONE);
         accountCard.setVisibility(View.GONE);
 
         // Read bundle given from main (which was passed from login).
@@ -109,14 +124,25 @@ public class AdminActivity extends AppCompatActivity {
         } else {
             id = extras.getInt("id", -1);
             admin = extras.getBoolean("isAdmin", false);
+            username = extras.getString("username"); // used when moving back to the main view.
         }
 
+        unlockAccountButton.setOnClickListener(v -> toggle(unlockAccountContainer));
+
+        unlockBtn.setOnClickListener(v -> {
+            String targetIdStr = unlockSearchField.getText().toString().trim();
+            if (targetIdStr.isEmpty() || !targetIdStr.matches(".*\\d.*")) {
+                Toast.makeText(this, "Enter a target user ID", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            unlockRequest(Long.parseLong(targetIdStr));
+        });
 
         activateDeacButton.setOnClickListener(v -> toggle(activateDeacContainer));
 
         activateBtn.setOnClickListener(v -> {
             String targetIdStr = cardSearchField.getText().toString().trim();
-            if (targetIdStr.isEmpty()) {
+            if (targetIdStr.isEmpty() || !targetIdStr.matches(".*\\d.*")) {
                 Toast.makeText(this, "Enter a target user ID", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -131,7 +157,6 @@ public class AdminActivity extends AppCompatActivity {
             }
             activateDeactivateRequest(Long.parseLong(targetIdStr), false);
         });
-
 
         promoteDemoteButton.setOnClickListener(v -> toggle(promoteDemoteContainer));
 
@@ -171,6 +196,9 @@ public class AdminActivity extends AppCompatActivity {
 
         toMainButton.setOnClickListener(v -> {
             Intent intent = new Intent(AdminActivity.this, MainActivity.class);
+            intent.putExtra("id", id);
+            intent.putExtra("isAdmin", admin);
+            intent.putExtra("username", username);
             startActivity(intent);
         });
     }
@@ -219,6 +247,39 @@ public class AdminActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
                 }
         );
+
+        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(request);
+    }
+
+    // POST /admin/users{targetId}/unlock
+    private void unlockRequest(long targetId) {
+        if (id == -1) {
+            Toast.makeText(getApplicationContext(), "Bad user session", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String url = API_URL + "/users/" + targetId + "/unlock?userId=" + id;
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST, url,
+                response -> Toast.makeText(this,
+                        "User " + targetId + " unlocked",
+                        Toast.LENGTH_SHORT).show(),
+                error -> {
+                    String msg = "Unlock failed.";
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        msg = new String(error.networkResponse.data);
+                    }
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
 
         VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(request);
     }

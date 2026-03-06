@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private Button toAdminButton;
     private int id;
 
+    private String username;
     private boolean isAdmin;
     private static final String DELETE_URL = "http://coms-3090-022.class.las.iastate.edu:8080/users/";
     @Override
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             id = extras.getInt("id", -1);
             isAdmin = extras.getBoolean("isAdmin", false);
+            username = extras.getString("username", "Please log out and back in");
             messageText.setText("Welcome " + extras.getString("username"));
             usernameText.setText(extras.getString("username")); // this will come from LoginActivity
             loginBackButton.setVisibility(View.VISIBLE);            // set new login button visible
@@ -125,6 +127,9 @@ public class MainActivity extends AppCompatActivity {
 
                 /* when signup button is pressed, use intent to switch to Signup Activity */
                 Intent intent = new Intent(MainActivity.this, PriceCrudActivity.class);
+                intent.putExtra("id", id);
+                intent.putExtra("isAdmin", isAdmin);
+                intent.putExtra("username", username);
                 startActivity(intent);
             }
         });
@@ -150,6 +155,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 Intent intent = new Intent(MainActivity.this, CardSearchActivity.class);
+                intent.putExtra("id", id);
+                intent.putExtra("isAdmin", isAdmin);
+                intent.putExtra("username", username);
                 startActivity(intent);
             }
         });

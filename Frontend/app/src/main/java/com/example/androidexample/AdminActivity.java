@@ -65,6 +65,8 @@ public class AdminActivity extends AppCompatActivity {
 
     private boolean admin;
 
+    private String username;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +124,7 @@ public class AdminActivity extends AppCompatActivity {
         } else {
             id = extras.getInt("id", -1);
             admin = extras.getBoolean("isAdmin", false);
+            username = extras.getString("username"); // used when moving back to the main view.
         }
 
         unlockAccountButton.setOnClickListener(v -> toggle(unlockAccountContainer));
@@ -193,7 +196,9 @@ public class AdminActivity extends AppCompatActivity {
 
         toMainButton.setOnClickListener(v -> {
             Intent intent = new Intent(AdminActivity.this, MainActivity.class);
-            intent.putExtra("")
+            intent.putExtra("id", id);
+            intent.putExtra("isAdmin", admin);
+            intent.putExtra("username", username);
             startActivity(intent);
         });
     }

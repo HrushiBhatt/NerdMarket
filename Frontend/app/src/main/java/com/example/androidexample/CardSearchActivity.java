@@ -156,8 +156,8 @@ public class CardSearchActivity extends AppCompatActivity {
 
             Button btnEdit = clonedCard.findViewById(R.id.card_edit_btn);
 
-            //blocks the button from ever being visible
-            if(isAdmin){
+            //blocks the button from ever being visible if not an admin
+            if(!isAdmin){
                 btnEdit.setVisibility(View.GONE);
             }
 

@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             id = extras.getInt("id", -1);
             isAdmin = extras.getBoolean("isAdmin", false);
             messageText.setText("Welcome " + extras.getString("username"));
-            usernameText.setText(extras.getString("username") + " " + isAdmin); // this will come from LoginActivity
+            usernameText.setText(extras.getString("username")); // this will come from LoginActivity
             loginBackButton.setVisibility(View.VISIBLE);            // set new login button visible
             signupBackButton.setVisibility(View.VISIBLE);           // set new signup button visible
 

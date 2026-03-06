@@ -147,7 +147,7 @@ public class PriceCrudActivity extends AppCompatActivity {
             return;
         }
 
-        String url = PRICES_URL + priceIndex;
+        String url = PRICES_URL + "/" + priceIndex;
 
         JSONObject jsonObject = new JSONObject();
         try{

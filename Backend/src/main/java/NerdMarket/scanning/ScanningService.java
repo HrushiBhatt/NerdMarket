@@ -25,8 +25,8 @@ public class ScanningService {
     @Autowired
     private MarketRepository marketRepository;
 
-    private static final int ORB_FEATURES  = 1000;
-    private static final float RATIO_THRESH = 0.75f;
+    private static final int ORB_FEATURES  = 3000;
+    private static final float RATIO_THRESH = 0.60f;
 
     // Cache: cardId -> pre-computed ORB descriptors
     private final Map<Long, Mat> descriptorCache = new ConcurrentHashMap<>();
@@ -127,7 +127,7 @@ public class ScanningService {
 
         // Return cards within 70% of the top score, capped at 5 results
         return scores.entrySet().stream()
-                .filter(e -> e.getValue() >= topScore * 0.30)
+                .filter(e -> e.getValue() >= topScore * 0.1)
                 .sorted(Map.Entry.<Market, Double>comparingByValue().reversed())
                 .limit(5)
                 .map(e -> new ScanningMatch(e.getKey(), (int) Math.round((e.getValue() / topScore) * 100)))
@@ -204,9 +204,9 @@ public class ScanningService {
             result.put("octaveDistribution", octaveDist);
 
             // Spatial distribution — divide image into 3x3 grid, count keypoints per cell
-            int cellW = image.cols() / 3;
-            int cellH = image.rows() / 3;
-            int[][] grid = new int[3][3];
+            int cellW = image.cols() / 4;
+            int cellH = image.rows() / 4;
+            int[][] grid = new int[4][4];
             for (KeyPoint kp : kps) {
                 int col = Math.min((int)(kp.pt.x / cellW), 2);
                 int row = Math.min((int)(kp.pt.y / cellH), 2);

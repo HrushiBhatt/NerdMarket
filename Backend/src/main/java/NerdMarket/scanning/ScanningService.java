@@ -160,7 +160,7 @@ public class ScanningService {
 
         // Return cards within 70% of the top score, capped at 5 results
         return scores.entrySet().stream()
-                .filter(e -> e.getValue() >= topScore * 0.30)
+                .filter(e -> e.getValue() >= topScore * 0.1)
                 .sorted(Map.Entry.<Market, Double>comparingByValue().reversed())
                 .limit(5)
                 .map(e -> new ScanningMatch(e.getKey(), (int) Math.round((e.getValue() / topScore) * 100)))

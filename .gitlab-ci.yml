@@ -1,32 +1,27 @@
 stages:
-  - build
   - deploy
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-  DISCORD_WEBHOOK: "https://discord.com/api/webhooks/1470458727512412212/cE_zJ4I3ZIHMem0OwyLhig6wPhT9XJLgSkx_vxKa2-U3OpXiIirLzLBOhjE4FmX_Rd-7"
 
 cache:
   paths:
     - .m2/repository/
 
-build:
-  stage: build
-  script:
-    - cd Backend
-    - mvn clean package -DskipTests
-  artifacts:
-    paths:
-      - Backend/target/*.jar
-    expire_in: 1 hour
-  only:
-    - main
-
 deploy:
   stage: deploy
+  only:
+    - main
   script:
+    # Build backend
+    - cd Backend
+    - mvn clean package -DskipTests
+    - cd ..
+
+    # Grab commit message
     - COMMIT_MSG=$(echo "$CI_COMMIT_MESSAGE" | head -n 1)
 
+    # Send Discord notification - Starting
     - |
       curl -H "Content-Type: application/json" -X POST -d "{
         \"embeds\": [{
@@ -43,21 +38,18 @@ deploy:
         }]
       }" "$DISCORD_WEBHOOK"
 
-    - |
-      rsync -avz --delete \
-        --exclude='.git' \
-        --exclude='node_modules' \
-        --exclude='.idea' \
-        --exclude='*.iml' \
-        --exclude='.DS_Store' \
-        Backend/ ~/app/
+    # Copy built jar to app directory
+    - mkdir -p ~/app
+    - cp Backend/target/demo-0.0.1-SNAPSHOT.jar ~/app/demo-0.0.1-SNAPSHOT.jar
 
+    # Restart application
     - |
-      cd ~/app/target
+      cd ~/app
 
       pkill -f demo-0.0.1-SNAPSHOT.jar 2>/dev/null || true
       sleep 3
 
+      screen -S nerdmarket -X quit 2>/dev/null || true
       screen -dmS nerdmarket java -jar demo-0.0.1-SNAPSHOT.jar
       sleep 2
 
@@ -68,6 +60,7 @@ deploy:
         exit 1
       fi
 
+    # Send Discord notification - Success
     - |
       curl -H "Content-Type: application/json" -X POST -d "{
         \"embeds\": [{
@@ -101,8 +94,3 @@ deploy:
           }]
         }" "$DISCORD_WEBHOOK"
       fi
-
-  only:
-    - main
-  dependencies:
-    - build

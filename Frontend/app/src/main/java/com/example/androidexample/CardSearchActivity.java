@@ -15,6 +15,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.graphics.Color;
+import android.graphics.Paint;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import androidx.cardview.widget.CardView;
 
 import com.android.volley.AuthFailureError;
@@ -22,6 +29,11 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
+
+import com.github.mikephil.charting.charts.CandleStickChart;
+import com.github.mikephil.charting.data.CandleData;
+import com.github.mikephil.charting.data.CandleDataSet;
+import com.github.mikephil.charting.data.CandleEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -154,6 +166,9 @@ public class CardSearchActivity extends AppCompatActivity {
 
             clonedCard.setVisibility(View.VISIBLE);
 
+            CandleStickChart chart = clonedCard.findViewById(R.id.candleStick);
+            fetchAndRenderChart(cardId, chart);
+
             Button btnEdit = clonedCard.findViewById(R.id.card_edit_btn);
 
             //blocks the button from ever being visible if not an admin
@@ -283,6 +298,90 @@ public class CardSearchActivity extends AppCompatActivity {
         } catch (JSONException e) {
             Log.e("PUT error:", Objects.requireNonNull(e.getMessage()));
         }
+    }
+
+    private void fetchAndRenderChart(String cardId, CandleStickChart chart) {
+        String url = "http://coms-3090-022.class.las.iastate.edu:8080/api/prices/card/" + cardId;
+
+        JsonArrayRequest req = new JsonArrayRequest(
+                Request.Method.GET, url, null,
+                response -> {
+                    try {
+                        // Group prices by date (yyyy-MM-dd)
+                        Map<String, List<Double>> byDay = new LinkedHashMap<>();
+
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject rec = response.getJSONObject(i);
+                            double price = rec.getDouble("price");
+                            // recordedAt format: "2024-01-15T10:30:00"
+                            String dateTime = rec.getString("recordedAt");
+                            String day = dateTime.substring(0, 10); // "yyyy-MM-dd"
+
+                            byDay.computeIfAbsent(day, k -> new ArrayList<>()).add(price);
+                        }
+
+                        List<CandleEntry> entries = new ArrayList<>();
+                        int x = 0;
+                        for (Map.Entry<String, List<Double>> entry : byDay.entrySet()) {
+                            List<Double> prices = entry.getValue();
+                            float open  = prices.get(0).floatValue();
+                            float close = prices.get(prices.size() - 1).floatValue();
+                            float high  = Collections.max(prices).floatValue();
+                            float low   = Collections.min(prices).floatValue();
+
+                            // If only 1 price that day, spread slightly so candle is visible
+                            if (high == low) {
+                                high += 0.01f;
+                                low  -= 0.01f;
+                            }
+
+                            entries.add(new CandleEntry(x++, high, low, open, close));
+                        }
+
+                        renderCandleChart(chart, entries);
+
+                    } catch (JSONException e) {
+                        Log.e("Chart error", e.getMessage());
+                    }
+                },
+                error -> Log.e("Chart fetch error", error.toString())
+        ) {
+            @Override public Map<String, String> getHeaders() throws AuthFailureError {
+                return new HashMap<>();
+            }
+        };
+
+        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(req);
+    }
+
+    private void renderCandleChart(CandleStickChart chart, List<CandleEntry> entries) {
+        if (entries.isEmpty()) {
+            chart.setVisibility(View.GONE);
+            return;
+        }
+
+        CandleDataSet dataSet = new CandleDataSet(entries, "Price History");
+        dataSet.setShadowColor(Color.DKGRAY);
+        dataSet.setShadowWidth(0.7f);
+        dataSet.setDecreasingColor(Color.RED);
+        dataSet.setDecreasingPaintStyle(Paint.Style.FILL);
+        dataSet.setIncreasingColor(Color.rgb(40, 200, 40));
+        dataSet.setIncreasingPaintStyle(Paint.Style.FILL);
+        dataSet.setNeutralColor(Color.BLUE);
+        dataSet.setDrawValues(false);
+
+        CandleData candleData = new CandleData(dataSet);
+        chart.setData(candleData);
+
+        chart.getDescription().setEnabled(false);
+        chart.setBackgroundColor(Color.TRANSPARENT);
+        chart.getXAxis().setDrawGridLines(false);
+        chart.getAxisLeft().setTextColor(Color.WHITE);
+        chart.getAxisRight().setEnabled(false);
+        chart.getLegend().setTextColor(Color.WHITE);
+
+        chart.setVisibility(View.VISIBLE);
+        chart.invalidate();
     }
 
     private void toggleEditMode(boolean editing) {

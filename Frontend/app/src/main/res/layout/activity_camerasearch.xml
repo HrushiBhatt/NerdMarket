@@ -86,6 +86,18 @@
                 app:layout_constraintStart_toStartOf="@id/cardBox"
                 app:layout_constraintEnd_toEndOf="@id/cardBox" />
 
+            <View
+                android:id="@+id/nameBox"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#4400FF00"
+                app:layout_constraintTop_toTopOf="@id/cardBox"
+                app:layout_constraintStart_toStartOf="@id/cardBox"
+                app:layout_constraintEnd_toEndOf="@id/cardBox"
+                app:layout_constraintWidth_percent="0.35"
+                app:layout_constraintHeight_percent="0.048"
+                android:layout_marginEnd="57dp"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 

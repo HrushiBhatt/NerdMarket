@@ -24,6 +24,7 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.ImageProxy;
 
+import android.os.Environment;
 import android.view.Surface;
 import android.view.View;
 import android.widget.ImageButton;
@@ -109,6 +110,7 @@ public class CameraSearchActivity extends AppCompatActivity {
                     Bitmap processedForTessy = processImageForTessy(nameRegion);
                     String cardName = OCRCroppedName(processedForTessy);
                     Log.d("OCR", "Tessy got: " + cardName);
+                    debugSaveBitmap(processedForTessy, "tessy_input");
                     runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Card Name: " + cardName, Toast.LENGTH_LONG).show());
                 }).start();
             }
@@ -130,19 +132,21 @@ public class CameraSearchActivity extends AppCompatActivity {
 
         Log.d("CropDebug", "Image: " + screenWidth + "x" + screenHeight);
 
-        double cardWidthFrame = .8;
-        double aspectRatio = 2.5/3.5;
+        int cardLeft   = (int) (screenWidth  * 0.27);
+        int cardTop    = (int) (screenHeight * 0.26);
+        int cardWidth  = (int) (screenWidth  * 0.45);
+        int cardHeight = (int) (screenHeight * 0.48);
 
-        int cardWidth = (int) (screenWidth * cardWidthFrame);
-        int cardHeight = (int) (cardWidth / aspectRatio);
+        Log.d("CropDebug", "cardLeft=" + cardLeft + " cardTop=" + cardTop + " cardWidth=" + cardWidth + " nameHeight=" + cardHeight);
 
-        int cardLeft = (screenWidth - cardWidth) / 2;
-        int cardTop = (screenHeight - cardHeight) / 2;
-        int nameHeight = (int) (cardHeight * .06);
+        int nameLeft   = cardLeft + (int) (cardWidth * 0.05);
+        int nameTop    = cardTop;
+        int nameWidth  = (int) (cardWidth * 0.60);
+        int nameHeight = (int) (cardHeight * 0.08);
 
-        Log.d("CropDebug", "cardLeft=" + cardLeft + " cardTop=" + cardTop + " cardWidth=" + cardWidth + " nameHeight=" + nameHeight);
+        return Bitmap.createBitmap(portraitImage, nameLeft, nameTop, nameWidth, nameHeight);
+    //    return Bitmap.createBitmap(portraitImage, cardLeft, cardTop, cardWidth, cardHeight);
 
-        return Bitmap.createBitmap(fullImage, cardLeft, cardTop, cardWidth, nameHeight);
     }
 
     private String OCRCroppedName(Bitmap croppedBitmap){
@@ -153,6 +157,8 @@ public class CameraSearchActivity extends AppCompatActivity {
             copyTessDataFiles(dir);
         }
         tess.init(getFilesDir().getAbsolutePath(), "eng");
+        tess.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz -");
+
         tess.setImage(croppedBitmap);
         String result = tess.getUTF8Text().trim();
         tess.recycle();
@@ -209,6 +215,19 @@ public class CameraSearchActivity extends AppCompatActivity {
             }
         } catch (IOException e) {
             Log.e("OCR", "Error copying tess data files", e);
+        }
+    }
+
+    private void debugSaveBitmap(Bitmap bitmap, String filename) {
+        try {
+            File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename + ".png");
+            FileOutputStream out = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            out.flush();
+            out.close();
+            Log.d("DEBUG", "Saved bitmap to: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            Log.e("DEBUG", "Failed to save bitmap", e);
         }
     }
 }

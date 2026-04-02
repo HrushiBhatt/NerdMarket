@@ -45,7 +45,10 @@ public class NotificationService {
         //If no scheduled time, deliver immediately to all users
         if (scheduledAt == null) {
             deliverToAllUsers(notification);
+            //push to all connected users via WebSocket
+            NotificationSocket.broadcast("[" + type + "] " + title + ": " + message);
         }
+
         return notification;
     }
 
@@ -67,6 +70,9 @@ public class NotificationService {
         userNotification.setNotification(notification);
         userNotification.setUser(recipient);
         userNotificationRepository.save(userNotification);
+
+        //Push to the specific user via WebSocket if they're connected
+        NotificationSocket.sendMessageToUser(recipient.getUsername(), "[CARD_UPDATE] " + title + ": " + message);
 
         return notification;
     }

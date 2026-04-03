@@ -23,6 +23,7 @@ public class ScanningWebSocketConfig implements WebSocketMessageBrokerConfigurer
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/scanning")
                 .setAllowedOriginPatterns("*");
+<<<<<<< HEAD
     }
 
     @Bean
@@ -31,6 +32,8 @@ public class ScanningWebSocketConfig implements WebSocketMessageBrokerConfigurer
         container.setMaxTextMessageBufferSize(10 * 1024 * 1024);
         container.setMaxBinaryMessageBufferSize(10 * 1024 * 1024);
         return container;
+=======
+>>>>>>> 4b968be39811d303e2ed786b0d63f961a856223f
     }
 
     @Override

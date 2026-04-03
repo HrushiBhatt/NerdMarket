@@ -188,13 +188,18 @@ public class CameraSearchActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Photo taken", Toast.LENGTH_SHORT).show();
 
                 new Thread(() -> {
-                    Bitmap nameRegion = cropCardForNameOnly(bitmap);
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    Bitmap portraitImage = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+                    Bitmap fullCardRegion = cropImageForCard(portraitImage);
+                    Bitmap nameRegion = cropCardForNameOnly(portraitImage);
                     Bitmap processedForTessy = processImageForTessy(nameRegion);
                     String cardName = OCRCroppedName(processedForTessy);
                     Log.d("OCR", "Tessy got: " + cardName);
                     debugSaveBitmap(processedForTessy, "tessy_input");
                     runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Card Name: " + cardName, Toast.LENGTH_LONG).show());
-                    sendScanAndName(bitmap, cardName);
+                    sendScanAndName(fullCardRegion, cardName);
                 }).start();
             }
 
@@ -205,10 +210,7 @@ public class CameraSearchActivity extends AppCompatActivity {
         });
     }
 
-    private Bitmap cropCardForNameOnly(Bitmap fullImage){
-        Matrix matrix = new Matrix();
-        matrix.postRotate(90);
-        Bitmap portraitImage = Bitmap.createBitmap(fullImage, 0, 0, fullImage.getWidth(), fullImage.getHeight(), matrix, true);
+    private Bitmap cropCardForNameOnly(Bitmap portraitImage){
 
         int screenWidth = portraitImage.getWidth();
         int screenHeight = portraitImage.getHeight();
@@ -230,6 +232,23 @@ public class CameraSearchActivity extends AppCompatActivity {
         return Bitmap.createBitmap(portraitImage, nameLeft, nameTop, nameWidth, nameHeight);
     //    return Bitmap.createBitmap(portraitImage, cardLeft, cardTop, cardWidth, cardHeight);
 
+    }
+
+    private Bitmap cropImageForCard(Bitmap portraitImage){
+
+        int screenWidth = portraitImage.getWidth();
+        int screenHeight = portraitImage.getHeight();
+
+        Log.d("CropDebug", "Image: " + screenWidth + "x" + screenHeight);
+
+        int cardLeft   = (int) (screenWidth  * 0.27);
+        int cardTop    = (int) (screenHeight * 0.26);
+        int cardWidth  = (int) (screenWidth  * 0.45);
+        int cardHeight = (int) (screenHeight * 0.48);
+
+        Log.d("CropDebug", "cardLeft=" + cardLeft + " cardTop=" + cardTop + " cardWidth=" + cardWidth + " nameHeight=" + cardHeight);
+
+        return Bitmap.createBitmap(portraitImage, cardLeft, cardTop, cardWidth, cardHeight);
     }
 
     private String OCRCroppedName(Bitmap croppedBitmap){
@@ -313,4 +332,5 @@ public class CameraSearchActivity extends AppCompatActivity {
             Log.e("DEBUG", "Failed to save bitmap", e);
         }
     }
+
 }

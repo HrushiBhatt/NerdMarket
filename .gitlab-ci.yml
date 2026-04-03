@@ -39,6 +39,7 @@ deploy:
 
     # Copy built jar to app directory
     - mkdir -p ~/app
+    - mkdir -p ~/app/logs
     - cp Backend/target/demo-0.0.1-SNAPSHOT.jar ~/app/demo-0.0.1-SNAPSHOT.jar
 
     # Restart application

@@ -34,5 +34,25 @@ public class UserNotification {
 
     private boolean isRead = false;
     private LocalDateTime readAt;
+
+    public String getNotificationType() {
+        return notification != null ? notification.getType() : null;
+    }
+
+    public String getNotificationTitle() {
+        return notification != null ? notification.getTitle() : null;
+    }
+
+    public String getNotificationMessage() {
+        return notification != null ? notification.getMessage() : null;
+    }
+
+    public Long getNotificationSenderId() {
+        return notification != null ? notification.getSenderId() : null;
+    }
+
+    public LocalDateTime getNotificationCreatedAt() {
+        return notification != null ? notification.getCreatedAt() : null;
+    }
 }
 

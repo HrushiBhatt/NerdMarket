@@ -27,24 +27,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-
-        <!-- Original CameraSearchActivity (no launcher) -->
-        <!--
         <activity
             android:name=".CameraSearchActivity"
             android:exported="false" />
-        -->
-
-        <!-- CameraSearchActivity as launcher -->
-        <activity
-            android:name=".CameraSearchActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
         <activity
             android:name=".PriceCrudActivity"
             android:exported="false" />
@@ -55,9 +40,6 @@
             android:name=".CardSearchActivity"
             android:exported="true">
         </activity>
-
-        <!-- Original InitialActivity launcher -->
-        <!--
         <activity
             android:name=".InitialActivity"
             android:exported="true">
@@ -66,7 +48,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        -->
+
 
     </application>
 

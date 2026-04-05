@@ -51,8 +51,9 @@ public class CardSearchActivity extends AppCompatActivity {
     private String currentCardId;
 
     private Button returnToMain;
-
     private int id;
+    private int bundleCardID;
+    private String bundleCardIDString;
     private String username;
     private boolean isAdmin;
 
@@ -92,6 +93,7 @@ public class CardSearchActivity extends AppCompatActivity {
         returnToMain = findViewById(R.id.cardlookup_to_main_button);
 
         Bundle extras = getIntent().getExtras();
+
         if (extras == null) {
             id = -1;
             isAdmin = false;
@@ -99,6 +101,8 @@ public class CardSearchActivity extends AppCompatActivity {
             id = extras.getInt("id", -1);
             isAdmin = extras.getBoolean("isAdmin", false);
             username = extras.getString("username"); // used when moving back to the main view.
+            bundleCardID = extras.getInt("bundleCardID");
+            bundleCardIDString = String.valueOf(bundleCardID);
         }
         cameraSearch.setOnClickListener(v -> {
             Intent intent = new Intent(CardSearchActivity.this, CameraSearchActivity.class);
@@ -116,6 +120,11 @@ public class CardSearchActivity extends AppCompatActivity {
             intent.putExtra("username", username);
             startActivity(intent);
         });
+
+        if (!bundleCardIDString.isEmpty()) {
+            fetchCardById(bundleCardIDString);
+            bundleCardIDString = null;
+        }
     }
 
 

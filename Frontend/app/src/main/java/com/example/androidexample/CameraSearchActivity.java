@@ -2,6 +2,7 @@ package com.example.androidexample;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -54,6 +55,7 @@ import ua.naiksoftware.stomp.StompClient;
 public class CameraSearchActivity extends AppCompatActivity {
     private PreviewView previewView;
     private ImageButton captureButton;
+    private ImageButton backtoSearchButton;
     private ImageCapture imageCapture;
     private static final int CAMERA_PERMISSION_CODE = 309;
     private String WEBSOCKET_URL = "ws://coms-3090-022.class.las.iastate.edu:8080/ws/scanning";
@@ -66,6 +68,7 @@ public class CameraSearchActivity extends AppCompatActivity {
 
         previewView = findViewById(R.id.cameraSearch_previewView);
         captureButton = findViewById(R.id.cameraSearch_camera_capture_btn);
+        backtoSearchButton = findViewById(R.id.cameraSearch_back_btn);
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
 
@@ -74,6 +77,11 @@ public class CameraSearchActivity extends AppCompatActivity {
             public void onClick(View v) {
                 takePhoto();
             }
+        });
+
+        backtoSearchButton.setOnClickListener(v -> {
+            Intent intent = new Intent(CameraSearchActivity.this, CardSearchActivity.class);
+            startActivity(intent);
         });
 
         WebSocketInit();
@@ -108,7 +116,12 @@ public class CameraSearchActivity extends AppCompatActivity {
                     JSONObject topCard = cards.getJSONObject(0);
                     int confidence = topCard.getInt("confidence");
                     JSONObject card = topCard.getJSONObject("card");
+                    int bundleCardID = card.getInt("id");
                     String returnedCardName = card.getString("cardName");
+                    Intent intent = new Intent(CameraSearchActivity.this, CardSearchActivity.class);
+                    intent.putExtra("bundleCardID", bundleCardID);
+                    startActivity(intent);
+
 
                     runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Match: " + returnedCardName +
                             "Confidence: " + confidence, Toast.LENGTH_LONG).show());

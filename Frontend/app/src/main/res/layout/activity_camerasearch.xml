@@ -98,6 +98,17 @@
                 app:layout_constraintHeight_percent="0.048"
                 android:layout_marginEnd="57dp"/>
 
+            <ImageButton
+                android:id="@+id/cameraSearch_back_btn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_media_previous"
+                app:tint="@android:color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 

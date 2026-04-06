@@ -55,10 +55,10 @@ public class CardSearchActivity extends AppCompatActivity {
 
     private EditText cardNameEdit, cardTypeEdit, cardSetEdit, cardRarityEdit, cardPriceEdit;
     private Button cardEditBtn, cardSaveBtn;
+    private Button cardBinderSavebtn, cardBinderRemovebtn;
     private LinearLayout cardListContainer;
 
     private JSONArray cards;
-    private  JSONObject card;
     private String currentCardId;
 
     private Button returnToMain;
@@ -99,6 +99,11 @@ public class CardSearchActivity extends AppCompatActivity {
         cardEditBtn    = findViewById(R.id.card_edit_btn);
         cardSaveBtn    = findViewById(R.id.card_save_btn);
 
+        //Saving cards to binder
+        cardBinderRemovebtn = findViewById(R.id.card_removeFromBinder_btn);
+        cardBinderSavebtn = findViewById(R.id.card_addTobinder_btn);
+
+        //Nav to main.
         returnToMain = findViewById(R.id.cardlookup_to_main_button);
 
         Bundle extras = getIntent().getExtras();
@@ -136,7 +141,7 @@ public class CardSearchActivity extends AppCompatActivity {
         cardView.setVisibility(View.INVISIBLE);
 
         currentCardId = query;
-        fetchCardById(query);
+        fetchCardByName(query);
     }
 
     private void handlePercolate(JSONArray response) throws JSONException {
@@ -178,6 +183,11 @@ public class CardSearchActivity extends AppCompatActivity {
 
             Button btnSave = clonedCard.findViewById(R.id.card_save_btn);
 
+            Button btnBinderSave   = clonedCard.findViewById(R.id.card_addTobinder_btn);
+            Button btnBinderRemove = clonedCard.findViewById(R.id.card_removeFromBinder_btn);
+
+            btnBinderSave.setOnClickListener(v -> addCardToBinder(cardId));
+
             btnEdit.setOnClickListener(v -> {
                 // Copy current info into the edit fields
                 ((EditText) clonedCard.findViewById(R.id.card_name_edit)).setText(((TextView) clonedCard.findViewById(R.id.card_name)).getText().toString().replace("Name: ", ""));
@@ -193,6 +203,7 @@ public class CardSearchActivity extends AppCompatActivity {
                 clonedCard.findViewById(R.id.card_price).setVisibility(View.GONE);   clonedCard.findViewById(R.id.card_price_edit).setVisibility(View.VISIBLE);
                 btnEdit.setVisibility(View.GONE);
                 btnSave.setVisibility(View.VISIBLE);
+                cardBinderSavebtn.setVisibility(View.GONE);
             });
 
             btnSave.setOnClickListener(v -> makeJsonObjPutReq(cardId, imgUrl, clonedCard));
@@ -330,6 +341,45 @@ public class CardSearchActivity extends AppCompatActivity {
         }
     }
 
+    //put down some requests here for the binder.
+    private void addCardToBinder(String cardId) {
+        String url = "http://coms-3090-022.class.las.iastate.edu:8080/api/users/" + username + "/binder";
+
+        try {
+            JSONObject body = new JSONObject();
+            body.put("card_id", String.valueOf(cardId));
+
+            JsonObjectRequest request = new JsonObjectRequest(
+                    Request.Method.POST,
+                    url,
+                    body,
+                    response -> {
+                        try {
+                            String message = response.getString("message");
+                            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            Log.e("BINDER error:", e.getMessage());
+                        }
+                    },
+                    error -> {
+                        if (error.networkResponse != null) {
+                            int statusCode = error.networkResponse.statusCode;
+                            String errorBody = new String(error.networkResponse.data);
+                            Log.e("BINDER error", statusCode + ": " + errorBody);
+                        }
+                        Toast.makeText(this, "Error adding card to binder.", Toast.LENGTH_SHORT).show();
+                    }
+            ) {
+                @Override public Map<String, String> getHeaders() throws AuthFailureError { return new HashMap<>(); }
+            };
+
+            VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(request);
+
+        } catch (JSONException e) {
+            Log.e("BINDER error:", Objects.requireNonNull(e.getMessage()));
+        }
+    }
+
     private void fetchAndRenderChart(String cardId, CandleStickChart chart) {
         String url = "http://coms-3090-022.class.las.iastate.edu:8080/api/prices/card/" + cardId;
 
@@ -337,7 +387,7 @@ public class CardSearchActivity extends AppCompatActivity {
                 Request.Method.GET, url, null,
                 response -> {
                     try {
-                        // Group prices by date (yyyy-MM-dd)
+                        // Group prices by date (year-month-date)
                         Map<String, List<Double>> byDay = new LinkedHashMap<>();
 
                         for (int i = 0; i < response.length(); i++) {
@@ -345,7 +395,7 @@ public class CardSearchActivity extends AppCompatActivity {
                             double price = rec.getDouble("price");
                             // recordedAt format: "2024-01-15T10:30:00"
                             String dateTime = rec.getString("recordedAt");
-                            String day = dateTime.substring(0, 10); // "yyyy-MM-dd"
+                            String day = dateTime.substring(0, 10); // "Year-Month-date"
 
                             byDay.computeIfAbsent(day, k -> new ArrayList<>()).add(price);
                         }

@@ -66,25 +66,41 @@ public class MarketService {
                                 String setName = (set != null) ? (String) set.get("name") : "Unknown";
                                 Market marketCard = findOrCreate(name, setName, "POKEMON");
                                 marketCard.setCardRarity(rarity);
-                                // Get price from TCGPlayer
-                                double price = 0.0;
-                                Map pricing = (Map) cardResponse.get("pricing");
-                                if (pricing != null) {
-                                    Map tcgplayer = (Map) pricing.get("tcgplayer");
-                                    if (tcgplayer != null) {
-                                        Map variant = (Map) tcgplayer.get("holofoil");
-                                        if (variant == null) {
-                                            variant = (Map) tcgplayer.get("normal");
-                                        }
-                                        if (variant == null) {
-                                            variant = (Map) tcgplayer.get("reverseHolofoil");
-                                        }
-                                        if (variant != null && variant.get("marketPrice") != null) {
-                                            price = ((Number) variant.get("marketPrice")).doubleValue();
+                                // Get price from TCGPlayer which now supports all updated tags/types
+                                double existingPrice = marketCard.getPrice();
+                                boolean foundPrice = false;
+                                String matchedVariant = null;
+                                Object pricingObj = cardResponse.get("pricing");
+                                if (pricingObj instanceof Map<?, ?> pricingMap) {
+                                    Object tcgplayerObj = pricingMap.get("tcgplayer");
+                                    if (tcgplayerObj instanceof Map<?, ?> tcgplayerMap) {
+                                        String[] variantKeys = {"holofoil", "normal", "reverse-holofoil", "reverseHolofoil", "reverse", "1st-edition-holofoil", "1st-edition", "unlimited-holofoil", "unlimited"};
+                                        for (String key : variantKeys) {
+                                            Object variantObj = tcgplayerMap.get(key);
+                                            if (!(variantObj instanceof Map<?, ?> variantMap)) {
+                                                continue;
+                                            }
+                                            Object marketPriceObj = variantMap.get("marketPrice");
+                                            if (marketPriceObj instanceof Number num) {
+                                                marketCard.setPrice(num.doubleValue());
+                                                foundPrice = true;
+                                                matchedVariant = key;
+                                                break;
+                                            }
+                                            if (marketPriceObj instanceof String s) {
+                                                try {
+                                                    marketCard.setPrice(Double.parseDouble(s));
+                                                    foundPrice = true;
+                                                    matchedVariant = key;
+                                                    break;
+                                                } catch (NumberFormatException ignored) {
+                                                }
+                                            }
                                         }
                                     }
                                 }
-                                marketCard.setPrice(price);
+                                // If no price found, keep existing price and don't overwrite with 0
+                                System.out.println("Pokemon card: " + name + " | set=" + setName + " | matchedVariant=" + matchedVariant + " | finalPrice=" + marketCard.getPrice());
                                 // Get image of the card from API
                                 String imageUrl = (String) cardResponse.get("image");
                                 if (imageUrl != null) {

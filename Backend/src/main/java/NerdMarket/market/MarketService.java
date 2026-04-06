@@ -248,16 +248,14 @@ public class MarketService {
                     Market marketCard = findOrCreate(name, setName, "YU-Gi-Oh");
                     marketCard.setCardRarity(rarity != null ? rarity : "Unknown");
                     //Grab prices from api.
-                    double price = 0.0;
                     List<Map> cardPrices = (List<Map>) card.get("card_prices");
                     if (cardPrices != null && !cardPrices.isEmpty()) {
                         Map priceInfo = cardPrices.get(0);
                         String tcgPrice = (String) priceInfo.get("tcgplayer_price");
                         if (tcgPrice != null && !tcgPrice.isEmpty()) {
-                            price =  Double.parseDouble(tcgPrice);
+                            marketCard.setPrice(Double.parseDouble(tcgPrice));
                         }
                     }
-                    marketCard.setPrice(price);
 
                     //Get image of the card.
                     List<Map> cardImages = (List<Map>) card.get("card_images");
@@ -272,7 +270,9 @@ public class MarketService {
                     if (totalCards % 1000 == 0) {
                         System.out.println("Progress: " + totalCards + "/" + total);
                     }
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                    System.out.println("Failed to fetch Yu-Gi-Oh card: " + card.get("name") + " | " + e.getClass().getSimpleName() + " | " + e.getMessage());
+                }
             }
             return "Successfully added " + totalCards + "Yu-Gi-Oh cards";
         } catch (Exception e) {

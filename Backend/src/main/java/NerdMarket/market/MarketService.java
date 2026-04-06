@@ -96,13 +96,15 @@ public class MarketService {
                             // Small delay to avoid skipping cards
                             Thread.sleep(50);
                         } catch (Exception e) {
-                            System.out.println("Failed to fetch card: " + cardId);
+                            System.out.println("Failed to fetch card: " + cardId + " | " + e.getClass().getSimpleName() + " | " + e.getMessage());
+                            e.printStackTrace();
                         }
                     }
                     // Delay between each set that gets imported.
                     Thread.sleep(200);
                 } catch (Exception e) {
-                    System.out.println("Failed to fetch set: " + setId);
+                    System.out.println("Failed to fetch set: " + setId +  " | " + e.getClass().getSimpleName() + " | " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
             return "Successfully added " + totalCards + " Pokemon cards from " + totalSets + " sets";

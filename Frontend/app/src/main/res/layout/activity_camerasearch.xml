@@ -17,8 +17,7 @@
         <androidx.camera.view.PreviewView
             android:id="@+id/cameraSearch_previewView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:implementationMode="compatible" />
+            android:layout_height="match_parent"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

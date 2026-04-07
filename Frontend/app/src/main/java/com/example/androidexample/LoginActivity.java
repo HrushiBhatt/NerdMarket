@@ -16,6 +16,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,12 +42,12 @@ public class LoginActivity extends AppCompatActivity {
         //tracks if the user is an admin.
 
 
-        /* click listener on login button pressed */
+        //Login listener
         goButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                /* grab strings from user inputs */
+                //grab username and pass
                 String usernameOrEmail = usernameEditText.getText().toString().trim();
                 String password = passwordEditText.getText().toString().trim();
 
@@ -55,68 +57,66 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 JSONObject jsonObject = new JSONObject();
-
-                try{
+                try {
                     jsonObject.put("usernameOrEmail", usernameOrEmail);
                     jsonObject.put("password", password);
                 } catch (JSONException e) {
-                    e.printStackTrace(); // Handle JSON parsing errors
+                    e.printStackTrace();
                 }
-
 
                 JsonObjectRequest jsonObjReq = new JsonObjectRequest(
                         Request.Method.POST,
                         LOGIN_URL,
                         jsonObject,
-
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject jsonObject) {
-                                try {
-                                    int ID = jsonObject.getInt("id");
-                                    String USERNAME = jsonObject.getString("username");
-                                    boolean IS_ADMIN = jsonObject.getBoolean("admin");
-                                    Toast.makeText(getApplicationContext(), "Login Successful!", Toast.LENGTH_LONG).show();
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    intent.putExtra("id", ID);  // key-value to pass to the MainActivity
-                                    intent.putExtra("username", USERNAME);  // key-value to pass to the MainActivity
-                                    intent.putExtra("isAdmin", IS_ADMIN); // another key-value to pass to the MainActivity.
-                                    startActivity(intent);
-                                    finish();
-                                } catch (JSONException e) {
-                                    e.printStackTrace(); // Handle JSON parsing errors
-                                }
+                        response -> {
+                            try {
+                                int ID = response.getInt("id");
+                                String USERNAME = response.getString("username");
+                                boolean IS_ADMIN = response.getBoolean("admin");
+                                Toast.makeText(getApplicationContext(), "Login Successful!", Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.putExtra("id", ID);
+                                intent.putExtra("username", USERNAME);
+                                intent.putExtra("isAdmin", IS_ADMIN);
+                                startActivity(intent);
+                                finish();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
                         },
-
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                String message = "Login Failed.";
-                                if (error.networkResponse != null){
-                                    message = new String(error.networkResponse.data);
-                                }
-                                Log.e("Volley Error", error.toString()); // Log error details
-                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                        error -> {
+                            String message = "Login Failed.";
+                            if (error.getMessage() != null) {
+                                message = error.getMessage();
                             }
+                            Log.e("Volley Error", message);
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                         }
-                ){
-                    // Override getHeaders() if authentication headers are needed
+                ) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         HashMap<String, String> headers = new HashMap<>();
-//                      headers.put("Authorization", "Bearer YOUR_ACCESS_TOKEN"); // Example authentication header
-                        headers.put("Content-Type", "application/json"); // Example content-type header
+                        headers.put("Content-Type", "application/json");
                         return headers;
                     }
+
+                    @Override
+                    protected VolleyError parseNetworkError(VolleyError volleyError) {
+                        if (volleyError.networkResponse != null && volleyError.networkResponse.data != null) {
+                            volleyError = new VolleyError(
+                                    new String(volleyError.networkResponse.data, StandardCharsets.UTF_8)
+                            );
+                        }
+                        return volleyError;
+                    }
                 };
-                VolleySingleton.getInstance(getApplicationContext())
-                        .addToRequestQueue(jsonObjReq);
+
+                VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjReq);
             }
 
         });
 
-        /* click listener on signup button pressed */
+        //Listener for signup
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

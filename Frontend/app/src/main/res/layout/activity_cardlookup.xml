@@ -112,6 +112,14 @@
                 android:scaleType="fitCenter"
                 android:contentDescription="Card Image"/>
 
+            <com.github.mikephil.charting.charts.CandleStickChart
+                android:id="@+id/candleStick"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
+
             <!-- Name -->
             <TextView
                 android:id="@+id/card_name"
@@ -253,6 +261,15 @@
                     android:visibility="gone"
                     android:layout_marginStart="4dp"/>
 
+                <Button
+                    android:id="@+id/card_addTobinder_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Add To Binder"
+                    android:textColor="#ffffff"
+                    android:backgroundTint="#1565C0"
+                    android:layout_marginEnd="4dp"/>
             </LinearLayout>
 
         </LinearLayout>

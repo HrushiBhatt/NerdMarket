@@ -14,7 +14,15 @@ public class MarketService {
 
     @Autowired
     private MarketRepository marketRepository;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public MarketService() {
+        org.springframework.http.client.SimpleClientHttpRequestFactory factory =
+            new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(10000);
+        factory.setReadTimeout(15000);
+        this.restTemplate = new RestTemplate(factory);
+    }
 
     private Market findOrCreate(String name, String set, String type) {
         Market existing = marketRepository.findByCardNameAndCardSetAndCardType(name, set, type);
@@ -66,25 +74,41 @@ public class MarketService {
                                 String setName = (set != null) ? (String) set.get("name") : "Unknown";
                                 Market marketCard = findOrCreate(name, setName, "POKEMON");
                                 marketCard.setCardRarity(rarity);
-                                // Get price from TCGPlayer
-                                double price = 0.0;
-                                Map pricing = (Map) cardResponse.get("pricing");
-                                if (pricing != null) {
-                                    Map tcgplayer = (Map) pricing.get("tcgplayer");
-                                    if (tcgplayer != null) {
-                                        Map variant = (Map) tcgplayer.get("holofoil");
-                                        if (variant == null) {
-                                            variant = (Map) tcgplayer.get("normal");
-                                        }
-                                        if (variant == null) {
-                                            variant = (Map) tcgplayer.get("reverseHolofoil");
-                                        }
-                                        if (variant != null && variant.get("marketPrice") != null) {
-                                            price = ((Number) variant.get("marketPrice")).doubleValue();
+                                // Get price from TCGPlayer which now supports all updated tags/types
+                                double existingPrice = marketCard.getPrice();
+                                boolean foundPrice = false;
+                                String matchedVariant = null;
+                                Object pricingObj = cardResponse.get("pricing");
+                                if (pricingObj instanceof Map<?, ?> pricingMap) {
+                                    Object tcgplayerObj = pricingMap.get("tcgplayer");
+                                    if (tcgplayerObj instanceof Map<?, ?> tcgplayerMap) {
+                                        String[] variantKeys = {"holofoil", "normal", "reverse-holofoil", "reverseHolofoil", "reverse", "1st-edition-holofoil", "1st-edition", "unlimited-holofoil", "unlimited"};
+                                        for (String key : variantKeys) {
+                                            Object variantObj = tcgplayerMap.get(key);
+                                            if (!(variantObj instanceof Map<?, ?> variantMap)) {
+                                                continue;
+                                            }
+                                            Object marketPriceObj = variantMap.get("marketPrice");
+                                            if (marketPriceObj instanceof Number num) {
+                                                marketCard.setPrice(num.doubleValue());
+                                                foundPrice = true;
+                                                matchedVariant = key;
+                                                break;
+                                            }
+                                            if (marketPriceObj instanceof String s) {
+                                                try {
+                                                    marketCard.setPrice(Double.parseDouble(s));
+                                                    foundPrice = true;
+                                                    matchedVariant = key;
+                                                    break;
+                                                } catch (NumberFormatException ignored) {
+                                                }
+                                            }
                                         }
                                     }
                                 }
-                                marketCard.setPrice(price);
+                                // If no price found, keep existing price and don't overwrite with 0
+                                System.out.println("Pokemon card: " + name + " | set=" + setName + " | matchedVariant=" + matchedVariant + " | finalPrice=" + marketCard.getPrice());
                                 // Get image of the card from API
                                 String imageUrl = (String) cardResponse.get("image");
                                 if (imageUrl != null) {
@@ -92,17 +116,22 @@ public class MarketService {
                                 }
                                 marketRepository.save(marketCard);
                                 totalCards++;
+                                if (totalCards % 1000 == 0 && totalCards > 0) {
+                                    System.out.println("Pokemon progress: " + totalCards + " cards processed (set " + currentSet + "/" + totalSets + ")");
+                                }
                             }
                             // Small delay to avoid skipping cards
                             Thread.sleep(50);
                         } catch (Exception e) {
-                            System.out.println("Failed to fetch card: " + cardId);
+                            System.out.println("Failed to fetch card: " + cardId + " | " + e.getClass().getSimpleName() + " | " + e.getMessage());
+                            e.printStackTrace();
                         }
                     }
                     // Delay between each set that gets imported.
                     Thread.sleep(200);
                 } catch (Exception e) {
-                    System.out.println("Failed to fetch set: " + setId);
+                    System.out.println("Failed to fetch set: " + setId +  " | " + e.getClass().getSimpleName() + " | " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
             return "Successfully added " + totalCards + " Pokemon cards from " + totalSets + " sets";
@@ -154,12 +183,10 @@ public class MarketService {
                                     Market marketCard = findOrCreate((String) card.get("name"), (String) card.get("set_name"), "MTG");
                                     marketCard.setCardRarity((String) card.get("rarity"));
                                     //Get price of card
-                                    double price = 0.0;
                                     Map prices = (Map) card.get("prices");
                                     if (prices != null && prices.get("usd") != null) {
-                                        price = Double.parseDouble((String) prices.get("usd"));
+                                        marketCard.setPrice(Double.parseDouble((String) prices.get("usd")));
                                     }
-                                    marketCard.setPrice(price);
 
                                     //Get image URL of card
                                     Map imageUris = (Map) card.get("image_uris");
@@ -168,7 +195,9 @@ public class MarketService {
                                     }
                                     marketRepository.save(marketCard);
                                     totalCards++;
-                                } catch (Exception e) {}
+                                } catch (Exception e) {
+                                    System.out.println("Failed to fetch MTG card: " + card.get("name") + " | " + e.getClass().getSimpleName() + " | " + e.getMessage());
+                                }
                             }
                         }
                         //Checks next page in the API
@@ -230,16 +259,14 @@ public class MarketService {
                     Market marketCard = findOrCreate(name, setName, "YU-Gi-Oh");
                     marketCard.setCardRarity(rarity != null ? rarity : "Unknown");
                     //Grab prices from api.
-                    double price = 0.0;
                     List<Map> cardPrices = (List<Map>) card.get("card_prices");
                     if (cardPrices != null && !cardPrices.isEmpty()) {
                         Map priceInfo = cardPrices.get(0);
                         String tcgPrice = (String) priceInfo.get("tcgplayer_price");
                         if (tcgPrice != null && !tcgPrice.isEmpty()) {
-                            price =  Double.parseDouble(tcgPrice);
+                            marketCard.setPrice(Double.parseDouble(tcgPrice));
                         }
                     }
-                    marketCard.setPrice(price);
 
                     //Get image of the card.
                     List<Map> cardImages = (List<Map>) card.get("card_images");
@@ -254,7 +281,9 @@ public class MarketService {
                     if (totalCards % 1000 == 0) {
                         System.out.println("Progress: " + totalCards + "/" + total);
                     }
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                    System.out.println("Failed to fetch Yu-Gi-Oh card: " + card.get("name") + " | " + e.getClass().getSimpleName() + " | " + e.getMessage());
+                }
             }
             return "Successfully added " + totalCards + "Yu-Gi-Oh cards";
         } catch (Exception e) {

@@ -244,7 +244,7 @@ public class CameraSearchActivity extends AppCompatActivity {
 
         Log.d("CropDebug", "cardLeft=" + cardLeft + " cardTop=" + cardTop + " cardWidth=" + cardWidth + " nameHeight=" + cardHeight);
 
-        int nameLeft   = cardLeft + (int) (cardWidth * 0.13);
+        int nameLeft   = cardLeft + (int) (cardWidth * 0.15);
         int nameTop    = cardTop;
         int nameWidth  = (int) (cardWidth * 0.40);
         int nameHeight = (int) (cardHeight * 0.06);

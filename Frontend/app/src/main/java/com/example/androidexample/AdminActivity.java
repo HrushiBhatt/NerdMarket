@@ -1,5 +1,6 @@
 package com.example.androidexample;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,19 +24,9 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-
 public class AdminActivity extends AppCompatActivity {
 
     private static final String API_URL = "http://coms-3090-022.class.las.iastate.edu:8080/admin";
-    private static final String WS_BASE_URL = "ws://coms-3090-022.class.las.iastate.edu:8080/notifications/";
-    private WebSocket webSocket;
-    private OkHttpClient client;
-
-
 
     // Activate/Deactivate
     private Button activateDeacButton;
@@ -88,7 +79,6 @@ public class AdminActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
-
 
         // Get all views
 
@@ -244,8 +234,6 @@ public class AdminActivity extends AppCompatActivity {
             intent.putExtra("username", username);
             startActivity(intent);
         });
-
-        WebSocketInit();
     }
 
     //Toggle helper to switch between views toggled on or off.
@@ -440,39 +428,6 @@ public class AdminActivity extends AppCompatActivity {
         };
 
         VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(request);
-    }
-
-    // Websocket stuff:
-
-    //Websocket init
-    private void WebSocketInit() {
-        client = new OkHttpClient();
-
-        okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(WS_BASE_URL + username)
-                .build();
-
-        webSocket = client.newWebSocket(request, new WebSocketListener() {
-
-            @Override
-            public void onOpen(WebSocket ws, Response response) {
-                Log.d("WS_NOTIF", "Connected: " + username);
-            }
-
-            @Override
-            public void onClosing(WebSocket ws, int code, String reason) {
-                ws.close(1000, null);
-                Log.d("WS_NOTIF", "Closing: " + reason);
-            }
-
-            @Override
-            public void onFailure(WebSocket ws, Throwable t, Response response) {
-                Log.e("WS_NOTIF", "Error: " + t.getMessage());
-                runOnUiThread(() ->
-                        Toast.makeText(AdminActivity.this, "Connection failed", Toast.LENGTH_SHORT).show()
-                );
-            }
-        });
     }
 
     // POST /notifications

@@ -98,11 +98,8 @@ public class NotificationActivity extends AppCompatActivity {
                 boolean isRead    = n.optBoolean("read", false);
 
                 runOnUiThread(() -> {
-                    // Live messages go to position 0 (top)
                     percolateCard(
-                            notifId == -1 ? null : notifId,
-                            type, title, msg, timestamp, isRead,
-                            0
+                            notifId == -1 ? null : notifId, type, title, msg, timestamp, isRead, 0
                     );
                     fetchUnreadCount();
                 });

@@ -1,5 +1,9 @@
 stages:
-  - deploy
+  - mavenDeploy
+  - mavenTests
+  - mavenBuild
+  - androidTest
+  - androidBuild
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
@@ -9,8 +13,31 @@ cache:
   paths:
     - .m2/repository/
 
+
+maven-build:
+  stage: mavenBuild
+  tags:
+    - spring_bootTag
+  script:
+    - cd Backend
+    - mvn clean package
+
+maven-tests:
+  stage: mavenTests
+  tags:
+    - spring_bootTag
+  script:
+    - cd Backend
+    - mvn test
+  artifacts:
+    paths:
+      - Backend/target/*.jar
+
+
 deploy:
-  stage: deploy
+  stage: mavenDeploy
+  tags:
+    - spring_bootTag
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   script:

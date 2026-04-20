@@ -6,10 +6,9 @@ plugins {
 // Posted by RaGe, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-04-20, License - CC BY-SA 4.0
 
-task wrapper(type: Wrapper) {
+tasks.register('wrapper', Wrapper) {
     gradleVersion = '4.1'
 }
-
 
 android {
     namespace 'com.example.androidexample'

@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,13 +61,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView messageText;   // define message textview variable
     private TextView usernameText;  // define username textview variable
     private Button loginBackButton;
-    private Button cardDetailsButton;
+    private ImageButton cardDetailsButton;
     private Button priceCRUDButton;
     private Button biggestMoversButton;
     private Button signupBackButton;
     private Button deleteAccountButton;
     private Button toAdminButton;
-    private Button cardBinderButton;
+    private ImageButton cardBinderButton;
     private Button toNotificationsButton;
     private ImageButton hamburgerDropdownButton;
     private int id;
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         /* initialize UI elements */
         usernameText = findViewById(R.id.main_username_txt);// link to username textview in the Main activity XML
         signupBackButton = findViewById(R.id.back_to_signup_btn);
-        cardDetailsButton = findViewById(R.id.to_carddetails_btn);
+        cardDetailsButton = findViewById(R.id.main_toSearch_image);
         toAdminButton = findViewById(R.id.to_admin_btn);
         loginBackButton = findViewById(R.id.back_to_login_btn);
         signupBackButton.setVisibility(View.INVISIBLE);
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         deleteAccountButton = findViewById(R.id.delete_account_btn);
         priceCRUDButton = findViewById(R.id.to_pricecrud_btn);
         biggestMoversButton = findViewById(R.id.to_biggestmovers_btn);
-        cardBinderButton = findViewById(R.id.to_cardbinder_btn);
+        cardBinderButton = findViewById(R.id.main_toPortfolio_image);
         toNotificationsButton = findViewById(R.id.to_notifs_btn);
         hamburgerDropdownButton = findViewById(R.id.main_dropdown_btn);
 

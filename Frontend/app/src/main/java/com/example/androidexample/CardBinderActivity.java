@@ -63,7 +63,7 @@ public class CardBinderActivity extends AppCompatActivity {
      */
     private String cardUrl;
     /**
-     * Name of thecard
+     * Name of the card
      */
     private TextView cardName;
     /**

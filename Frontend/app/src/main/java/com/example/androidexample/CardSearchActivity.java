@@ -134,10 +134,11 @@ public class CardSearchActivity extends AppCompatActivity {
      * the current card's id
      */
     private String currentCardId;
+    private Button toBiggestMovers;
     /**
      * Return to main menu button
      */
-    private Button returnToMain;
+    private ImageView returnToMain;
     /**
      * The user's ID
      */
@@ -206,6 +207,7 @@ public class CardSearchActivity extends AppCompatActivity {
 
         //Nav to main.
         returnToMain = findViewById(R.id.cardlookup_to_main_button);
+        toBiggestMovers = findViewById(R.id.cardLookup_tobiggestmovers_btn);
 
         Bundle extras = getIntent().getExtras();
 
@@ -227,7 +229,18 @@ public class CardSearchActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnSearch.setOnClickListener(v -> handleSearch());
+        btnSearch.setOnClickListener(v -> {
+            toBiggestMovers.setVisibility(View.INVISIBLE);
+            handleSearch();
+        });
+
+        toBiggestMovers.setOnClickListener(v -> {
+            Intent intent = new Intent(CardSearchActivity.this, MoversActivity.class);
+            intent.putExtra("id", id);
+            intent.putExtra("isAdmin", isAdmin);
+            intent.putExtra("username", username);
+            startActivity(intent);
+        });
 
         cardEditBtn.setOnClickListener(v -> toggleEditMode(true));
 

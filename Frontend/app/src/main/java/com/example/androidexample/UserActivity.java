@@ -1,7 +1,6 @@
 package com.example.androidexample;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,102 +25,88 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-
-/*
-
-1. To run this project, open the directory "Android Example", otherwise it may not recognize the file structure properly
-
-2. Ensure you are using a compatible version of gradle, to do so you need to check 2 files.
-
-    AndroidExample/Gradle Scripts/build.gradle
-    Here, you will have this block of code. Ensure it is set to a compatible version,
-    in this case 8.12.2 should be sufficient:
-        plugins {
-            id 'com.android.application' version '8.12.2' apply false
-        }
-
-    Gradle Scripts/gradle-wrapper.properties
-
-3. This file is what actually determines the Gradle version used, 8.13 should be sufficient.
-    "distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip" ---Edit the version if needed
-
-4. You might be instructed by the plugin manager to upgrade plugins, accept it and you may execute the default selected options.
-
-5. Press "Sync project with gradle files" located at the top right of Android Studio,
-   once this is complete you will be able to run the app
-
-   This version is compatible with both JDK 17 and 21. The Java version you want to use can be
-   altered in Android Studio->Settings->Build, Execution, Deployment->Build Tools->Gradle
-
- */
-
-
-public class MainActivity extends AppCompatActivity {
-
-    private TextView messageText;   // define message textview variable
-    private TextView usernameText;  // define username textview variable
-    private Button loginBackButton;
-    private ImageButton cardDetailsButton;
-    private Button priceCRUDButton;
-    private Button biggestMoversButton;
+public class UserActivity extends AppCompatActivity {
     private Button signupBackButton;
     private Button deleteAccountButton;
-    private Button toAdminButton;
-    private ImageButton cardBinderButton;
     private Button toNotificationsButton;
+    private Button toAdminButton;
+    private Button loginBackButton;
     private ImageButton hamburgerDropdownButton;
+    private ImageButton cardBinderButton;
+    private ImageButton cardDetailsButton;
+    private ImageButton toHomeButton;
+    private TextView usernameText;
     private int id;
-
     private String username;
     private boolean isAdmin;
     private static final String DELETE_URL = "http://coms-3090-022.class.las.iastate.edu:8080/users/";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);             // link to Main activity XML
+        setContentView(R.layout.activity_user);
 
-        /* initialize UI elements */
-        usernameText = findViewById(R.id.main_username_txt);// link to username textview in the Main activity XML
-//        signupBackButton = findViewById(R.id.back_to_signup_btn);
-        cardDetailsButton = findViewById(R.id.main_toSearch_image);
-//        toAdminButton = findViewById(R.id.to_admin_btn);
-//        loginBackButton = findViewById(R.id.back_to_login_btn);
-//        signupBackButton.setVisibility(View.INVISIBLE);
-//        loginBackButton.setVisibility(View.INVISIBLE);
-//        deleteAccountButton = findViewById(R.id.delete_account_btn);
-//        priceCRUDButton = findViewById(R.id.to_pricecrud_btn);
-//        biggestMoversButton = findViewById(R.id.to_biggestmovers_btn);
-        cardBinderButton = findViewById(R.id.main_toPortfolio_image);
-//        toNotificationsButton = findViewById(R.id.to_notifs_btn);
-        hamburgerDropdownButton = findViewById(R.id.main_dropdown_btn);
+        signupBackButton = findViewById(R.id.userPage_back_to_signup_btn);
+        deleteAccountButton = findViewById(R.id.userPage_delete_account_btn);
+        toNotificationsButton = findViewById(R.id.userPage_to_notifs_btn);
+        toAdminButton = findViewById(R.id.userPage_to_admin_btn);
+        loginBackButton = findViewById(R.id.userPage_back_to_login_btn);
+        hamburgerDropdownButton = findViewById(R.id.userPage_dropdown_btn);
+        cardBinderButton = findViewById(R.id.userPage_toPortfolio_image);
+        cardDetailsButton = findViewById(R.id.userPage_toSearch_image);
+        toHomeButton = findViewById(R.id.userPage_home_image);
+        usernameText = findViewById(R.id.userPage_username_txt);
 
-
-
-        /* extract data passed into this activity from another activity */
         Bundle extras = getIntent().getExtras();
-        if(extras == null) {
-            usernameText.setText("Home Page");
+        if (extras == null) {
+            usernameText.setText("User Page");
         } else {
             id = extras.getInt("id", -1);
             isAdmin = extras.getBoolean("isAdmin", false);
             username = extras.getString("username", "Please log out and back in");
             usernameText.setText(extras.getString("username")); // this will come from LoginActivity
-//            loginBackButton.setVisibility(View.VISIBLE);            // set new login button visible
-//            signupBackButton.setVisibility(View.VISIBLE);           // set new signup button visible
-//
-//            //check if the user is an admin and make the admin tab visible.
-//            if (isAdmin) {
-//                toAdminButton.setVisibility(View.VISIBLE);
-//            } else {
-//                toAdminButton.setVisibility(View.GONE);
-//            }
+            loginBackButton.setVisibility(View.VISIBLE);            // set new login button visible
+            signupBackButton.setVisibility(View.VISIBLE);           // set new signup button visible
 
+            //check if the user is an admin and make the admin tab visible.
+            if (isAdmin) {
+                toAdminButton.setVisibility(View.VISIBLE);
+            } else {
+                toAdminButton.setVisibility(View.GONE);
+            }
         }
 
-        cardDetailsButton.setOnClickListener(new View.OnClickListener(){
+        signupBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /* when signup button is pressed, use intent to switch to Signup Activity */
+                Intent intent = new Intent(UserActivity.this, SignupActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        loginBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /* when login button is pressed, use intent to switch to Login Activity */
+                Intent intent = new Intent(UserActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        deleteAccountButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteAccountConfirm();
+            }
+        });
+
+        toNotificationsButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent intent = new Intent(MainActivity.this, CardSearchActivity.class);
+                Intent intent = new Intent(UserActivity.this, NotificationActivity.class);
                 intent.putExtra("id", id);
                 intent.putExtra("isAdmin", isAdmin);
                 intent.putExtra("username", username);
@@ -132,7 +117,29 @@ public class MainActivity extends AppCompatActivity {
         cardBinderButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent intent = new Intent(MainActivity.this, CardBinderActivity.class);
+                Intent intent = new Intent(UserActivity.this, CardBinderActivity.class);
+                intent.putExtra("id", id);
+                intent.putExtra("isAdmin", isAdmin);
+                intent.putExtra("username", username);
+                startActivity(intent);
+            }
+        });
+
+        cardDetailsButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(UserActivity.this, CardSearchActivity.class);
+                intent.putExtra("id", id);
+                intent.putExtra("isAdmin", isAdmin);
+                intent.putExtra("username", username);
+                startActivity(intent);
+            }
+        });
+
+        toHomeButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(UserActivity.this, MainActivity.class);
                 intent.putExtra("id", id);
                 intent.putExtra("isAdmin", isAdmin);
                 intent.putExtra("username", username);
@@ -143,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         hamburgerDropdownButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                PopupMenu popupMenu = new PopupMenu(MainActivity.this, v);
+                PopupMenu popupMenu = new PopupMenu(UserActivity.this, v);
                 popupMenu.getMenu().add(0, 1, 0, "User Page");
                 popupMenu.getMenu().add(0, 2, 1, "Notifications");
                 if (isAdmin) {
@@ -153,19 +160,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         if (item.getItemId() == 1) {
-                            Intent intent = new Intent(MainActivity.this, UserActivity.class);
-                            intent.putExtra("id", id);
-                            intent.putExtra("isAdmin", isAdmin);
-                            intent.putExtra("username", username);
-                            startActivity(intent);
+                            //Go to user page, but we're already there
                         } else if (item.getItemId() == 2) {
-                            Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+                            Intent intent = new Intent(UserActivity.this, NotificationActivity.class);
                             intent.putExtra("id", id);
                             intent.putExtra("isAdmin", isAdmin);
                             intent.putExtra("username", username);
                             startActivity(intent);
                         } else if (item.getItemId() == 3) {
-                            Intent intent = new Intent(MainActivity.this, AdminActivity.class);
+                            Intent intent = new Intent(UserActivity.this, AdminActivity.class);
                             intent.putExtra("id", id);
                             intent.putExtra("username", extras.getString("username"));
                             intent.putExtra("isAdmin", isAdmin);

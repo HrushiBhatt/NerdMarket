@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -134,13 +135,10 @@ public class CardSearchActivity extends AppCompatActivity {
      * the current card's id
      */
     private String currentCardId;
-    /**
-     * Return to main menu button
-     */
-    private Button returnToMain;
-    /**
-     * The user's ID
-     */
+
+    private ImageView returnToMain;
+    private ImageButton cardBinderButton;
+    private Button toBiggestMovers;
     private int id;
     /**
      * Card's Id from bundle
@@ -206,6 +204,8 @@ public class CardSearchActivity extends AppCompatActivity {
 
         //Nav to main.
         returnToMain = findViewById(R.id.cardlookup_to_main_button);
+        toBiggestMovers = findViewById(R.id.cardLookup_tobiggestmovers_btn);
+        cardBinderButton = findViewById(R.id.cardLookup_toPortfolio_image);
 
         Bundle extras = getIntent().getExtras();
 
@@ -227,7 +227,29 @@ public class CardSearchActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnSearch.setOnClickListener(v -> handleSearch());
+        btnSearch.setOnClickListener(v -> {
+            toBiggestMovers.setVisibility(View.INVISIBLE);
+            handleSearch();
+        });
+
+        toBiggestMovers.setOnClickListener(v -> {
+            Intent intent = new Intent(CardSearchActivity.this, MoversActivity.class);
+            intent.putExtra("id", id);
+            intent.putExtra("isAdmin", isAdmin);
+            intent.putExtra("username", username);
+            startActivity(intent);
+        });
+
+        cardBinderButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(CardSearchActivity.this, CardBinderActivity.class);
+                intent.putExtra("id", id);
+                intent.putExtra("isAdmin", isAdmin);
+                intent.putExtra("username", username);
+                startActivity(intent);
+            }
+        });
 
         cardEditBtn.setOnClickListener(v -> toggleEditMode(true));
 

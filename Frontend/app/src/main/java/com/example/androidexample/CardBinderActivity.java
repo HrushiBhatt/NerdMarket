@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -126,13 +127,10 @@ public class CardBinderActivity extends AppCompatActivity {
      * The current chosen card ID.
      */
     private String currentCardId;
-    /**
-     * Return to main button
-     */
-    private Button returnToMain;
-    /**
-     *  The user id
-     */
+
+    private ImageView returnToMain;
+    private ImageButton cardDetailsButton;
+
     private int id;
     /**
      * The username for the user.
@@ -178,7 +176,8 @@ public class CardBinderActivity extends AppCompatActivity {
         cardRarityEdit = findViewById(R.id.card_rarity_edit);
         cardPriceEdit  = findViewById(R.id.card_price_edit);
 
-        returnToMain = findViewById(R.id.cardlookup_to_main_button);
+        returnToMain = findViewById(R.id.cardBinder_home_image);
+        cardDetailsButton = findViewById(R.id.cardBinder_toSearch_image);
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -196,6 +195,17 @@ public class CardBinderActivity extends AppCompatActivity {
             intent.putExtra("isAdmin", isAdmin);
             intent.putExtra("username", username);
             startActivity(intent);
+        });
+
+        cardDetailsButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(CardBinderActivity.this, CardSearchActivity.class);
+                intent.putExtra("id", id);
+                intent.putExtra("isAdmin", isAdmin);
+                intent.putExtra("username", username);
+                startActivity(intent);
+            }
         });
 
         fetchCards();

@@ -147,6 +147,17 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
+        toAdminButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(UserActivity.this, AdminActivity.class);
+                intent.putExtra("id", id);
+                intent.putExtra("isAdmin", isAdmin);
+                intent.putExtra("username", username);
+                startActivity(intent);
+            }
+        });
+
         hamburgerDropdownButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){

@@ -418,7 +418,9 @@ public class CardSearchActivity extends AppCompatActivity {
                 },
                 error -> {
                     Log.e("GET by name error", error.toString());
-                    Toast.makeText(this, "No card found with id of:" + id, Toast.LENGTH_SHORT).show();
+                    if (!id.equals("0")) {
+                        Toast.makeText(this, "No card found with id of:" + id, Toast.LENGTH_SHORT).show();
+                    }
                 }
         ) {
             @Override public Map<String, String> getHeaders() throws AuthFailureError { return new HashMap<>(); }

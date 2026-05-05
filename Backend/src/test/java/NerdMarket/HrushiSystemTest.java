@@ -292,4 +292,63 @@ public class HrushiSystemTest {
         ResponseEntity<String> deleteByTypeResponse = restTemplate.exchange(baseUrl + "/api/cards/type/YU-Gi-Oh", HttpMethod.DELETE, null, String.class);
         assertEquals(200, deleteByTypeResponse.getStatusCode().value());
     }
+
+    //TEST 6: Price tracking CRUD and analytics endpoints.
+    @Test
+    public void priceCrudAndAnalyticsTest() throws Exception {
+        //Create a card to attach price records to
+        String cardJson = "{" + "\"cardType\":\"POKEMON\"," + "\"cardName\":\"TEST_HRUSHI_PriceCard\"," + "\"cardSet\":\"Test Set\"," + "\"cardRarity\":\"Holo\"," + "\"price\":80.00" + "}";
+        assertEquals(200, restTemplate.postForEntity(baseUrl + "/api/cards", jsonEntity(cardJson), String.class).getStatusCode().value());
+
+        //Look up the cardId
+        JSONArray allCards = new JSONArray(restTemplate.getForEntity(baseUrl + "/api/cards", String.class).getBody());
+        long cardId = -1;
+        for (int i = 0; i < allCards.length(); i++) {
+            if ("TEST_HRUSHI_PriceCard".equals(allCards.getJSONObject(i).getString("cardName"))) {
+                cardId = allCards.getJSONObject(i).getLong("id");
+                break;
+            }
+        }
+        assertTrue(cardId != -1);
+
+        //POST 2 price records, old (5 days ago, $80) and new (today, $40) - that's a 50% drop
+        String oldPrice = "{\"cardId\":" + cardId + ",\"price\":80.00,\"recordedAt\":\"" + java.time.LocalDateTime.now().minusDays(5) + "\"}";
+        String newPrice = "{\"cardId\":" + cardId + ",\"price\":40.00,\"recordedAt\":\"" + java.time.LocalDateTime.now() + "\"}";
+        assertEquals(200, restTemplate.postForEntity(baseUrl + "/api/prices", jsonEntity(oldPrice), String.class).getStatusCode().value());
+        assertEquals(200, restTemplate.postForEntity(baseUrl + "/api/prices", jsonEntity(newPrice), String.class).getStatusCode().value());
+
+        //GET all price records and latest price for this card
+        ResponseEntity<String> allPricesResponse = restTemplate.getForEntity(baseUrl + "/api/prices", String.class);
+        assertEquals(200, allPricesResponse.getStatusCode().value());
+        assertTrue(new JSONArray(allPricesResponse.getBody()).length() >= 2);
+
+        ResponseEntity<String> latestResponse = restTemplate.getForEntity(baseUrl + "/api/prices/card/" + cardId + "/latest", String.class);
+        assertEquals(200, latestResponse.getStatusCode().value());
+        assertEquals(40.00, new JSONObject(latestResponse.getBody()).getDouble("price"), 0.001);
+
+        //Find the latest price record id, then PUT to update it
+        long priceRecordId = new JSONObject(latestResponse.getBody()).getLong("id");
+        String updateJson = "{\"price\":35.00}";
+        ResponseEntity<String> updatePriceResponse = restTemplate.exchange(baseUrl + "/api/prices/" + priceRecordId, HttpMethod.PUT, jsonEntity(updateJson), String.class);
+        assertEquals(200, updatePriceResponse.getStatusCode().value());
+
+        //Hit each biggest-movers variant - just verify they respond 200 and return JSON arrays
+        String[] moverEndpoints = {"/api/prices/biggest-movers/2days", "/api/prices/biggest-movers/7days", "/api/prices/biggest-movers/21days", "/api/prices/biggest-movers/type/POKEMON", "/api/prices/biggest-movers/type/POKEMON/2days", "/api/prices/biggest-movers/type/POKEMON/7days", "/api/prices/biggest-movers/type/POKEMON/21days", "/api/prices/biggest-movers/gainers", "/api/prices/biggest-movers/losers"};
+        for (String endpoint : moverEndpoints) {
+            ResponseEntity<String> response = restTemplate.getForEntity(baseUrl + endpoint, String.class);
+            assertEquals(200, response.getStatusCode().value(), "Endpoint should return 200: " + endpoint);
+            assertNotNull(new JSONArray(response.getBody()), "Endpoint should return a JSON array: " + endpoint);
+        }
+
+        //POST one price record, then DELETE it via the single-record endpoint
+        String tempPrice = "{\"cardId\":" + cardId + ",\"price\":99.00}";
+        restTemplate.postForEntity(baseUrl + "/api/prices", jsonEntity(tempPrice), String.class);
+        long latestId = new JSONObject(restTemplate.getForEntity(baseUrl + "/api/prices/card/" + cardId + "/latest", String.class).getBody()).getLong("id");
+        ResponseEntity<String> deleteSingleResponse = restTemplate.exchange(baseUrl + "/api/prices/" + latestId, HttpMethod.DELETE, null, String.class);
+        assertEquals(200, deleteSingleResponse.getStatusCode().value());
+
+        //DELETE all price records for this card
+        ResponseEntity<String> deleteByCardResponse = restTemplate.exchange(baseUrl + "/api/prices/card/" + cardId, HttpMethod.DELETE, null, String.class);
+        assertEquals(200, deleteByCardResponse.getStatusCode().value());
+    }
 }

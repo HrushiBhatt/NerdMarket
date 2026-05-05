@@ -242,4 +242,54 @@ public class HrushiSystemTest {
         }
         assertTrue(foundOurCard, "Our test card should appear in biggest movers results");
     }
+
+    //TEST 5: Market search, update, top 10 by type, and delete by type.
+    @Test
+    public void marketSearchAndDeleteByTypeTest() throws Exception {
+        //POST 2 cards we can search for
+        String card1 = "{" + "\"cardType\":\"YU-Gi-Oh\"," + "\"cardName\":\"TEST_HRUSHI_BlueEyes\"," + "\"cardSet\":\"LOB\"," + "\"cardRarity\":\"Ultra\"," + "\"price\":250.00" + "}";
+        String card2 = "{" + "\"cardType\":\"YU-Gi-Oh\"," + "\"cardName\":\"TEST_HRUSHI_DarkMagician\"," + "\"cardSet\":\"LOB\"," + "\"cardRarity\":\"Ultra\"," + "\"price\":150.00" + "}";
+        assertEquals(200, restTemplate.postForEntity(baseUrl + "/api/cards", jsonEntity(card1), String.class).getStatusCode().value());
+        assertEquals(200, restTemplate.postForEntity(baseUrl + "/api/cards", jsonEntity(card2), String.class).getStatusCode().value());
+
+        //Search by name (case-insensitive)
+        ResponseEntity<String> searchResponse = restTemplate.getForEntity(baseUrl + "/api/cards/search/blueeyes", String.class);
+        assertEquals(200, searchResponse.getStatusCode().value());
+        JSONArray searchResults = new JSONArray(searchResponse.getBody());
+        boolean foundBlueEyes = false;
+        for (int i = 0; i < searchResults.length(); i++) {
+            if ("TEST_HRUSHI_BlueEyes".equals(searchResults.getJSONObject(i).getString("cardName"))) {
+                foundBlueEyes = true;
+                break;
+            }
+        }
+        assertTrue(foundBlueEyes, "Search should find BlueEyes case-insensitively");
+
+        //Get top 10 by card type
+        ResponseEntity<String> top10TypeResponse = restTemplate.getForEntity(baseUrl + "/api/cards/top10/YU-Gi-Oh", String.class);
+        assertEquals(200, top10TypeResponse.getStatusCode().value());
+        JSONArray top10Type = new JSONArray(top10TypeResponse.getBody());
+        assertTrue(top10Type.length() <= 10, "Top 10 by type should return at most 10 cards");
+
+        //Find BlueEyes id, then PUT to update it
+        long blueEyesId = -1;
+        JSONArray allCards = new JSONArray(restTemplate.getForEntity(baseUrl + "/api/cards", String.class).getBody());
+        for (int i = 0; i < allCards.length(); i++) {
+            if ("TEST_HRUSHI_BlueEyes".equals(allCards.getJSONObject(i).getString("cardName"))) {
+                blueEyesId = allCards.getJSONObject(i).getLong("id");
+                break;
+            }
+        }
+        assertTrue(blueEyesId != -1);
+        String updateJson = "{" + "\"cardType\":\"YU-Gi-Oh\"," + "\"cardName\":\"TEST_HRUSHI_BlueEyes\"," + "\"cardSet\":\"LOB\"," + "\"cardRarity\":\"Secret\"," + "\"price\":500.00" + "}";
+        ResponseEntity<String> updateResponse = restTemplate.exchange(baseUrl + "/api/cards/" + blueEyesId, HttpMethod.PUT, jsonEntity(updateJson), String.class);
+        assertEquals(200, updateResponse.getStatusCode().value());
+        //Verify the update worked
+        JSONObject updatedCard = new JSONObject(restTemplate.getForEntity(baseUrl + "/api/cards/" + blueEyesId, String.class).getBody());
+        assertEquals(500.00, updatedCard.getDouble("price"), 0.001);
+        assertEquals("Secret", updatedCard.getString("cardRarity"));
+        //Delete all cards of this type, verify endpoint responds successfully
+        ResponseEntity<String> deleteByTypeResponse = restTemplate.exchange(baseUrl + "/api/cards/type/YU-Gi-Oh", HttpMethod.DELETE, null, String.class);
+        assertEquals(200, deleteByTypeResponse.getStatusCode().value());
+    }
 }

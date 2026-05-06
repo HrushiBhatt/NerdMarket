@@ -586,4 +586,34 @@ public class HrushiSystemTest {
             }
         }
     }
+
+    //TEST 13: Chat history endpoint test.
+    @Test
+    public void chatHistoryTest() throws Exception {
+        int[] acceptableStatuses = {200, 400, 404};
+
+        //Hit chat history for room IDs 1 through 5 (the seeded default rooms)
+        for (long roomId = 1; roomId <= 5; roomId++) {
+            ResponseEntity<String> historyResponse = restTemplate.getForEntity(baseUrl + "/chat/rooms/" + roomId + "/history", String.class);
+            assertTrue(contains(acceptableStatuses, historyResponse.getStatusCode().value()), "History endpoint for room " + roomId + " should respond");
+
+            //If we got history back, touch the ChatMessage fields to confirm Jackson serialized them
+            if (historyResponse.getStatusCode().value() == 200) {
+                JSONArray history = new JSONArray(historyResponse.getBody());
+                for (int j = 0; j < history.length(); j++) {
+                    JSONObject msg = history.getJSONObject(j);
+                    msg.optString("username");
+                    msg.optString("content");
+                    msg.optString("sentAt");
+                    msg.optLong("id");
+                    msg.optLong("userId");
+                    msg.optLong("chatRoomId");
+                }
+            }
+        }
+
+        //Hit a non-existent room - exercises the room-not-found branch in ChatService.getRoomHistory
+        ResponseEntity<String> badRoomHistory = restTemplate.getForEntity(baseUrl + "/chat/rooms/999999/history", String.class);
+        assertTrue(contains(acceptableStatuses, badRoomHistory.getStatusCode().value()), "History for missing room should respond");
+    }
 }

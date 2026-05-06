@@ -20,7 +20,7 @@
             android:layout_alignParentStart="true"
             android:layout_marginStart="10dp"
             android:transitionName="logo_image_welcome"
-            android:src="@drawable/pngimg_com___glasses_png54332" />
+            android:src="@drawable/nerdmarket_logo" />
 
         <TextView
             android:id="@+id/main_username_txt"

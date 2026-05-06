@@ -10,7 +10,7 @@
 
     <ImageView
         android:id="@+id/logo_image_main"
-        tools:srcCompat="@drawable/pngimg_com___glasses_png54332"
+        tools:srcCompat="@drawable/nerdmarket_logo"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:transitionName="logo_image_welcome"

@@ -1,0 +1,157 @@
+package com.example.androidexample;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.filters.LargeTest;
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.containsString;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.CoreMatchers.allOf;
+
+import android.content.Intent;
+
+
+@RunWith(AndroidJUnit4ClassRunner.class)
+@LargeTest
+public class RudraSystemTest {
+    private static final int ID = 2;
+    private static final String USERNAME = "rudranai";
+    private static final int SIMULATED_DELAY_MS = 3345;
+
+    private static Intent sessionIntent(Class<?> enteredClass) {
+        Intent i = new Intent(ApplicationProvider.getApplicationContext(), enteredClass);
+        i.putExtra("id", ID);
+        i.putExtra("username", USERNAME);
+        i.putExtra("isAdmin", true);
+        return i;
+    }
+
+    @Test
+    public void testSearchCardAndAddToBinder() throws InterruptedException {
+        try (ActivityScenario<CardSearchActivity> scenario = ActivityScenario.launch(sessionIntent(CardSearchActivity.class))) {
+
+            onView(withId(R.id.card_search_field)).perform(typeText("A Case For K9"), closeSoftKeyboard());
+            onView(withId(R.id.card_search_btn)).perform(click());
+            Thread.sleep(SIMULATED_DELAY_MS);
+
+            onView(withId(R.id.card_view)).check(matches(isDisplayed()));
+            onView(withId(R.id.card_name)).check(matches(isDisplayed()));
+
+            onView(withId(R.id.card_addTobinder_btn)).perform(click());
+            Thread.sleep(SIMULATED_DELAY_MS);
+        }
+
+
+        try (ActivityScenario<CardBinderActivity> binderScenario = ActivityScenario.launch(sessionIntent(CardBinderActivity.class))) {
+            Thread.sleep(SIMULATED_DELAY_MS);
+
+            onView(withText(containsString("A Case for K9"))).perform(scrollTo()).check(matches(isDisplayed()));
+
+        }
+    }
+
+    @Test
+    public void testAdminActivateDeactivate() throws InterruptedException {
+        try (ActivityScenario<AdminActivity> scenario =
+                     ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
+
+
+            onView(withId(R.id.admin_activate_deactivate_btn)).perform(scrollTo(), click());
+            Thread.sleep(1000);
+            onView(withId(R.id.admin_activate_deactivate_container)).check(matches(isDisplayed()));
+
+            onView(withId(R.id.admin_activate_deactivate_search_field)).perform(scrollTo(), replaceText("12"), closeSoftKeyboard());
+            Thread.sleep(500);
+            onView(withId(R.id.admin_activate_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS );
+
+            onView(withId(R.id.admin_promote_demote_btn)).perform(scrollTo(), click());
+            Thread.sleep(1000);
+            onView(withId(R.id.admin_promote_demote_container)).check(matches(isDisplayed()));
+
+            onView(withId(R.id.admin_promote_demote_field)).perform(scrollTo(), replaceText("12"), closeSoftKeyboard());
+            Thread.sleep(500);
+            onView(withId(R.id.admin_demote_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS );
+
+            onView(withId(R.id.admin_activate_deactivate_search_field)).perform(scrollTo(), replaceText("12"), closeSoftKeyboard());
+            Thread.sleep(500);
+            onView(withId(R.id.admin_deactivate_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS );
+
+            onView(withId(R.id.admin_showAllAccounts_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS );
+            onView(withId(R.id.admin_account_cardDetail_name)).check(matches(withText(containsString("ID: 12  //  FakeUser!!  //  Active: false  //  Admin: false"))));
+
+            onView(withId(R.id.admin_activate_deactivate_search_field)).perform(scrollTo(), replaceText("12"), closeSoftKeyboard());
+            Thread.sleep(500);
+            onView(withId(R.id.admin_activate_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS );
+
+            onView(withId(R.id.admin_showAllAccounts_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS );
+            onView(withId(R.id.admin_account_cardDetail_name)).check(matches(withText(containsString("ID: 12  //  FakeUser!!  //  Active: true  //  Admin: false"))));
+        }
+    }
+
+    @Test
+    public void testAdminPromoteDemote() throws InterruptedException {
+        try (ActivityScenario<AdminActivity> scenario =
+                     ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
+
+            onView(withId(R.id.admin_activate_deactivate_btn)).perform(scrollTo(), click());
+            Thread.sleep(1000);
+            onView(withId(R.id.admin_activate_deactivate_container)).check(matches(isDisplayed()));
+
+            onView(withId(R.id.admin_activate_deactivate_search_field)).perform(scrollTo(), replaceText("12"), closeSoftKeyboard());
+            Thread.sleep(500);
+            onView(withId(R.id.admin_activate_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS);
+
+            onView(withId(R.id.admin_promote_demote_btn)).perform(scrollTo(), click());
+            Thread.sleep(1000);
+            onView(withId(R.id.admin_promote_demote_container)).check(matches(isDisplayed()));
+
+            onView(withId(R.id.admin_promote_demote_field)).perform(scrollTo(), replaceText("12"), closeSoftKeyboard());
+            Thread.sleep(500);
+            onView(withId(R.id.admin_demote_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS );
+
+            onView(withId(R.id.admin_promote_demote_field)).perform(scrollTo(), replaceText("12"), closeSoftKeyboard());
+            Thread.sleep(500);
+            onView(withId(R.id.admin_promote_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS );
+
+            onView(withId(R.id.admin_showAllAccounts_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS );
+            onView(withId(R.id.admin_account_cardDetail_name)).check(matches(withText(containsString("ID: 12  //  FakeUser!!  //  Active: true  //  Admin: true"))));
+
+            onView(withId(R.id.admin_promote_demote_field)).perform(scrollTo(), replaceText("12"), closeSoftKeyboard());
+            Thread.sleep(500);
+            onView(withId(R.id.admin_demote_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS );
+
+            onView(withId(R.id.admin_showAllAccounts_btn)).perform(scrollTo(), click());
+            Thread.sleep(SIMULATED_DELAY_MS);
+            onView(withId(R.id.admin_account_cardDetail_name)).check(matches(withText(containsString("ID: 12  //  FakeUser!!  //  Active: true  //  Admin: false"))));
+        }
+    }
+}

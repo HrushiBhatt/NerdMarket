@@ -195,7 +195,7 @@ public class AdminActivity extends AppCompatActivity {
         // Activate buttons
         activateDeacButton   = findViewById(R.id.admin_activate_deactivate_btn);
         activateDeacContainer= findViewById(R.id.admin_activate_deactivate_container);
-        cardSearchField      = findViewById(R.id.card_search_field);
+        cardSearchField      = findViewById(R.id.admin_activate_deactivate_search_field);
         activateBtn          = findViewById(R.id.admin_activate_btn);
         deactivateBtn        = findViewById(R.id.admin_deactivate_btn);
 

@@ -413,9 +413,9 @@ public class HrushiSystemTest {
         }
     }
 
-    //TEST 9: Test - hit notification and chat read endpoints to exercise serialization paths.
+    //TEST 9: Test - notification and chat read endpoints to exercise serialization paths.
     @Test
-    public void notificationAndChatTest() throws Exception {
+    public void notificationAndChatReadTest() throws Exception {
         long adminId = 3;
 
         //Notification endpoints - tolerant assertions
@@ -508,9 +508,9 @@ public class HrushiSystemTest {
         }
     }
 
-    //TEST 11: Notifications and chat read endpoints exercise the controller/service/repo stack.
+    //TEST 11: Notifications and chat endpoints exercise the controller/service/repo stack.
     @Test
-    public void notificationsAndChatSmokeTest() throws Exception {
+    public void notificationsAndChatExerciseTest() throws Exception {
         long adminId = 3;
         int[] acceptableStatuses = {200, 400, 404};
 
@@ -560,5 +560,30 @@ public class HrushiSystemTest {
         //Try chat rooms for non-existent user - exercises the user-not-found error branch
         ResponseEntity<String> badChat = restTemplate.getForEntity(baseUrl + "/chat/rooms/999999", String.class);
         assertTrue(contains(acceptableStatuses, badChat.getStatusCode().value()), "Bad user chat endpoint should respond");
+    }
+
+    //TEST 12: Notification endpoints for multiple existing users.
+    @Test
+    public void notificationMultiUserTest() throws Exception {
+        //Hit notification endpoints across multiple existing user IDs to exercise repeated calls
+        long[] userIds = {1, 3, 4};
+        int[] acceptableStatuses = {200, 400, 404};
+
+        for (long userId : userIds) {
+            //Get notifications for this user
+            ResponseEntity<String> userNotifs = restTemplate.getForEntity(baseUrl + "/notifications/user/" + userId, String.class);
+            assertTrue(contains(acceptableStatuses, userNotifs.getStatusCode().value()), "User " + userId + " notifications should respond");
+
+            //Get unread count for this user
+            ResponseEntity<String> unread = restTemplate.getForEntity(baseUrl + "/notifications/unread/" + userId, String.class);
+            assertTrue(contains(acceptableStatuses, unread.getStatusCode().value()), "User " + userId + " unread count should respond");
+
+            //If we got data, verify the count is consistent with the list size
+            if (userNotifs.getStatusCode().value() == 200 && unread.getStatusCode().value() == 200) {
+                JSONArray notifs = new JSONArray(userNotifs.getBody());
+                long count = Long.parseLong(unread.getBody());
+                assertTrue(count <= notifs.length(), "Unread count should not exceed total for user " + userId);
+            }
+        }
     }
 }

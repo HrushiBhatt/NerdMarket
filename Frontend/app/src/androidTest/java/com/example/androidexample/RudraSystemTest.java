@@ -71,8 +71,7 @@ public class RudraSystemTest {
 
     @Test
     public void testAdminActivateDeactivate() throws InterruptedException {
-        try (ActivityScenario<AdminActivity> scenario =
-                     ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
+        try (ActivityScenario<AdminActivity> scenario = ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
 
 
             onView(withId(R.id.admin_activate_deactivate_btn)).perform(scrollTo(), click());
@@ -115,8 +114,7 @@ public class RudraSystemTest {
 
     @Test
     public void testAdminPromoteDemote() throws InterruptedException {
-        try (ActivityScenario<AdminActivity> scenario =
-                     ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
+        try (ActivityScenario<AdminActivity> scenario = ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
 
             onView(withId(R.id.admin_activate_deactivate_btn)).perform(scrollTo(), click());
             Thread.sleep(1000);
@@ -158,8 +156,7 @@ public class RudraSystemTest {
 
     @Test
     public void testToggleVisibility() {
-        try (ActivityScenario<AdminActivity> scenario =
-                     ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
+        try (ActivityScenario<AdminActivity> scenario = ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
 
             onView(withId(R.id.admin_activate_deactivate_btn)).perform(scrollTo(), click());
 
@@ -173,8 +170,7 @@ public class RudraSystemTest {
 
     @Test
     public void testEmptyNotif() {
-        try (ActivityScenario<AdminActivity> scenario =
-                     ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
+        try (ActivityScenario<AdminActivity> scenario = ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
 
             onView(withId(R.id.admin_create_notif_btn)).perform(scrollTo(), click());
 
@@ -184,8 +180,7 @@ public class RudraSystemTest {
 
     @Test
     public void testSendNotif() {
-        try (ActivityScenario<AdminActivity> scenario =
-                     ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
+        try (ActivityScenario<AdminActivity> scenario = ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
 
             onView(withId(R.id.admin_create_notif_btn)).perform(scrollTo(), click());
 
@@ -199,8 +194,7 @@ public class RudraSystemTest {
 
     @Test
     public void testToMain() {
-        try (ActivityScenario<AdminActivity> scenario =
-                     ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
+        try (ActivityScenario<AdminActivity> scenario = ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
 
             onView(withId(R.id.admin_to_main_btn)).perform(click());
         }
@@ -208,8 +202,7 @@ public class RudraSystemTest {
 
     @Test
     public void testToPriceCrud() {
-        try (ActivityScenario<AdminActivity> scenario =
-                     ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
+        try (ActivityScenario<AdminActivity> scenario = ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
 
             onView(withId(R.id.admin_to_priceCrud_btn)).perform(click());
         }
@@ -217,8 +210,7 @@ public class RudraSystemTest {
 
     @Test
     public void testUnlockAccountFlow() {
-        try (ActivityScenario<AdminActivity> scenario =
-                     ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
+        try (ActivityScenario<AdminActivity> scenario = ActivityScenario.launch(sessionIntent(AdminActivity.class))) {
 
             onView(withId(R.id.admin_unlock_btn))
                     .perform(scrollTo(), click());
@@ -233,18 +225,47 @@ public class RudraSystemTest {
 
     @Test
     public void testBadSession() {
-        Intent badIntent = new Intent(
-                ApplicationProvider.getApplicationContext(),
-                AdminActivity.class
+        Intent badIntent = new Intent(ApplicationProvider.getApplicationContext(), AdminActivity.class
         );
 
-        try (ActivityScenario<AdminActivity> scenario =
-                     ActivityScenario.launch(badIntent)) {
+        try (ActivityScenario<AdminActivity> scenario = ActivityScenario.launch(badIntent)) {
 
             onView(withId(R.id.admin_showAllAccounts_btn))
                     .perform(scrollTo(), click());
         }
     }
+
+    @Test
+    public void testBinderNav() {
+        try (ActivityScenario<CardBinderActivity> scenario = ActivityScenario.launch(sessionIntent(CardBinderActivity.class))) {
+
+            onView(withId(R.id.cardBinder_home_image)).perform(click());
+            onView(withId(R.id.main_toSearch_image)).perform(click());
+            onView(withId(R.id.cardlookup_to_main_button)).perform(click());
+        }
+    }
+
+    @Test
+    public void testCardDisplaysInBinder() throws InterruptedException {
+        try (ActivityScenario<CardBinderActivity> scenario = ActivityScenario.launch(sessionIntent(CardBinderActivity.class))) {
+
+            Thread.sleep(SIMULATED_DELAY_MS);
+
+            onView(allOf(withId(R.id.card_view), isDisplayed())).check(matches(isDisplayed()));
+        }
+    }
+
+    @Test
+    public void testChartVisibility() throws InterruptedException {
+        try (ActivityScenario<CardBinderActivity> scenario = ActivityScenario.launch(sessionIntent(CardBinderActivity.class))) {
+
+            Thread.sleep(SIMULATED_DELAY_MS);
+
+            onView(allOf(withId(R.id.candleStick), isDisplayed())).check(matches(isDisplayed()));
+        }
+    }
+
+
 
 
 

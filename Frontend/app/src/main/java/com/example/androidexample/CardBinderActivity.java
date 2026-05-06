@@ -339,81 +339,6 @@ public class CardBinderActivity extends AppCompatActivity {
     }
 
     /**
-     * handles PUT /api/cards/{id} (unused)
-     * @param cardId the card ID
-     * @param imgUrl the image Url for the card
-     * @param card the card's parent component.
-     */
-    private void makeJsonObjPutReq(String cardId, String imgUrl, CardView card) {
-
-        EditText editName = card.findViewById(R.id.card_name_edit);
-        EditText editType = card.findViewById(R.id.card_type_edit);
-        EditText editSet = card.findViewById(R.id.card_set_edit);
-        EditText editRarity = card.findViewById(R.id.card_rarity_edit);
-        EditText editPrice = card.findViewById(R.id.card_price_edit);
-        TextView currName = card.findViewById(R.id.card_name);
-        TextView currType = card.findViewById(R.id.card_type);
-        TextView currSet = card.findViewById(R.id.card_set);
-        TextView currRarity = card.findViewById(R.id.card_rarity);
-        TextView currPrice = card.findViewById(R.id.card_price);
-        Button btnEdit    = card.findViewById(R.id.card_edit_btn);
-        Button btnSave    = card.findViewById(R.id.card_save_btn);
-        String priceText = editPrice.getText().toString().trim();
-
-        if (priceText.isEmpty()) {
-            Toast.makeText(this, "Price cannot be empty.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        try {
-            JSONObject updatedCard = new JSONObject();
-            updatedCard.put("imageUrl",   imgUrl);
-            updatedCard.put("cardName",   editName.getText().toString().trim());
-            updatedCard.put("cardType",   editType.getText().toString().trim());
-            updatedCard.put("cardSet",    editSet.getText().toString().trim());
-            updatedCard.put("cardRarity", editRarity.getText().toString().trim());
-            updatedCard.put("price",      Double.parseDouble(priceText));
-
-            JsonObjectRequest putRequest = new JsonObjectRequest(
-                    Request.Method.PUT,
-                    BASE_URL + "/" + cardId,
-                    updatedCard,
-                    response -> {
-                        try {
-                            currName.setText("Name: "    + response.getString("cardName"));
-                            currType.setText("Type: "    + response.getString("cardType"));
-                            currSet.setText("Set: "      + response.getString("cardSet"));
-                            currRarity.setText("Rarity: "+ response.getString("cardRarity"));
-                            currPrice.setText("Price: $" + String.format("%.2f", response.getDouble("price")));
-                        } catch (JSONException e) {
-                            Log.e("PUT error:", e.getMessage());
-                        }
-                        currName.setVisibility(View.VISIBLE);   editName.setVisibility(View.GONE);
-                        currType.setVisibility(View.VISIBLE);   editType.setVisibility(View.GONE);
-                        currSet.setVisibility(View.VISIBLE);    editSet.setVisibility(View.GONE);
-                        currRarity.setVisibility(View.VISIBLE); editRarity.setVisibility(View.GONE);
-                        currPrice.setVisibility(View.VISIBLE);  editPrice.setVisibility(View.GONE);
-                        btnEdit.setVisibility(View.VISIBLE);  btnSave.setVisibility(View.GONE);
-                        Toast.makeText(this, "Card saved.", Toast.LENGTH_SHORT).show();
-                    },
-                    error -> {
-                        Log.e("PUT error", error.toString());
-                        Toast.makeText(this, "Error saving card edits.", Toast.LENGTH_SHORT).show();
-                    }
-            ) {
-                @Override public Map<String, String> getHeaders() throws AuthFailureError { return new HashMap<>(); }
-            };
-
-            VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(putRequest);
-
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Price must be a valid number.", Toast.LENGTH_SHORT).show();
-        } catch (JSONException e) {
-            Log.e("PUT error:", Objects.requireNonNull(e.getMessage()));
-        }
-    }
-
-    /**
      * Fetches pricing data and renders the chart.
      * @param cardId the card ID
      * @param chart the chart component
@@ -499,37 +424,5 @@ public class CardBinderActivity extends AppCompatActivity {
 
         chart.setVisibility(View.VISIBLE);
         chart.invalidate();
-    }
-
-    /**
-     * Toggles the editing mode (unused)
-     * @param editing To determine if a card is being edited.
-     */
-    private void toggleEditMode(boolean editing) {
-        cardName.setVisibility(editing ? View.GONE : View.VISIBLE);
-        cardNameEdit.setVisibility(editing ? View.VISIBLE : View.GONE);
-
-        cardType.setVisibility(editing ? View.GONE : View.VISIBLE);
-        cardTypeEdit.setVisibility(editing ? View.VISIBLE : View.GONE);
-
-        cardSet.setVisibility(editing ? View.GONE : View.VISIBLE);
-        cardSetEdit.setVisibility(editing ? View.VISIBLE : View.GONE);
-
-        cardRarity.setVisibility(editing ? View.GONE : View.VISIBLE);
-        cardRarityEdit.setVisibility(editing ? View.VISIBLE : View.GONE);
-
-        cardPrice.setVisibility(editing ? View.GONE : View.VISIBLE);
-        cardPriceEdit.setVisibility(editing ? View.VISIBLE : View.GONE);
-
-        cardEditBtn.setVisibility(editing ? View.GONE : View.VISIBLE);
-        cardSaveBtn.setVisibility(editing ? View.VISIBLE : View.GONE);
-
-        if (editing) {
-            cardNameEdit.setText(cardName.getText().toString().replace("Name: ", ""));
-            cardTypeEdit.setText(cardType.getText().toString().replace("Type: ", ""));
-            cardSetEdit.setText(cardSet.getText().toString().replace("Set: ", ""));
-            cardRarityEdit.setText(cardRarity.getText().toString().replace("Rarity: ", ""));
-            cardPriceEdit.setText(cardPrice.getText().toString().replace("Price: $", ""));
-        }
     }
 }

@@ -13,11 +13,12 @@
 
     <ImageView
         android:id="@+id/logo_image_welcome"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_marginTop="40dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:contentDescription="Welcome image"
         android:transitionName="logo_image_welcome"
-        app:srcCompat="@drawable/pngimg_com___glasses_png54332"/>
+        app:srcCompat="@drawable/nerdmarket_logo"/>
 
     <TextView
         android:layout_width="wrap_content"

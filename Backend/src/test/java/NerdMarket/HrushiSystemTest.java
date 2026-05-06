@@ -413,9 +413,9 @@ public class HrushiSystemTest {
         }
     }
 
-    //TEST 9: Smoke test - hit notification and chat read endpoints to exercise serialization paths.
+    //TEST 9: Test - hit notification and chat read endpoints to exercise serialization paths.
     @Test
-    public void notificationAndChatSmokeTest() throws Exception {
+    public void notificationAndChatTest() throws Exception {
         long adminId = 3;
 
         //Notification endpoints - tolerant assertions
@@ -506,5 +506,59 @@ public class HrushiSystemTest {
             card.optString("imageUrl");
             card.optLong("id");
         }
+    }
+
+    //TEST 11: Notifications and chat read endpoints exercise the controller/service/repo stack.
+    @Test
+    public void notificationsAndChatSmokeTest() throws Exception {
+        long adminId = 3;
+        int[] acceptableStatuses = {200, 400, 404};
+
+        //Get notifications for the admin user - exercises NotificationController.getUserNotifications
+        ResponseEntity<String> userNotifs = restTemplate.getForEntity(baseUrl + "/notifications/user/" + adminId, String.class);
+        assertTrue(contains(acceptableStatuses, userNotifs.getStatusCode().value()), "User notifications endpoint should respond");
+
+        //Iterate user notifications to exercise UserNotification getters during JSON serialization
+        if (userNotifs.getStatusCode().value() == 200) {
+            JSONArray notifs = new JSONArray(userNotifs.getBody());
+            for (int i = 0; i < notifs.length(); i++) {
+                JSONObject n = notifs.getJSONObject(i);
+                n.optString("notificationType");
+                n.optString("notificationTitle");
+                n.optString("notificationMessage");
+                n.optLong("notificationSenderId");
+                n.optString("notificationCreatedAt");
+                n.optBoolean("read");
+                n.optLong("id");
+            }
+        }
+
+        //Get unread count - exercises NotificationController.getUnreadCount
+        ResponseEntity<String> unread = restTemplate.getForEntity(baseUrl + "/notifications/unread/" + adminId, String.class);
+        assertTrue(contains(acceptableStatuses, unread.getStatusCode().value()), "Unread count endpoint should respond");
+
+        //Try non-existent user - exercises the user-not-found error branch
+        ResponseEntity<String> badNotifs = restTemplate.getForEntity(baseUrl + "/notifications/user/999999", String.class);
+        assertTrue(contains(acceptableStatuses, badNotifs.getStatusCode().value()), "Bad user notifications endpoint should respond");
+
+        //Get chat rooms accessible to admin - exercises ChatController.getAccessibleRooms
+        ResponseEntity<String> chatRooms = restTemplate.getForEntity(baseUrl + "/chat/rooms/" + adminId, String.class);
+        assertTrue(contains(acceptableStatuses, chatRooms.getStatusCode().value()), "Chat rooms endpoint should respond");
+
+        //Iterate chat rooms to exercise ChatRoom getters during JSON serialization
+        if (chatRooms.getStatusCode().value() == 200) {
+            JSONArray rooms = new JSONArray(chatRooms.getBody());
+            for (int i = 0; i < rooms.length(); i++) {
+                JSONObject room = rooms.getJSONObject(i);
+                room.optString("name");
+                room.optString("type");
+                room.optString("cardType");
+                room.optLong("id");
+            }
+        }
+
+        //Try chat rooms for non-existent user - exercises the user-not-found error branch
+        ResponseEntity<String> badChat = restTemplate.getForEntity(baseUrl + "/chat/rooms/999999", String.class);
+        assertTrue(contains(acceptableStatuses, badChat.getStatusCode().value()), "Bad user chat endpoint should respond");
     }
 }

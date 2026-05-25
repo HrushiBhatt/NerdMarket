@@ -6,6 +6,12 @@ Built as a team project for COM S 309 (Software Development Practices) at Iowa S
 
 ---
 
+## Application Demo
+
+▶️ **[Watch the demo on YouTube](https://youtu.be/El1KD3GnCjg)**
+
+---
+
 ## My Role
 
 I was the lead backend developer on a 4-person team (2 backend, 2 Android). My contributions in this repo include:
